@@ -26,11 +26,10 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-
   asuka: ^2.0.0-nullsafety.2
 
   url_strategy: ^0.2.0
-
+  localstorage: ^4.0.0+1
   flutter_modular: ^3.0.0-nullsafety.1
 
   flutter_bloc: ^7.0.0
@@ -38,8 +37,6 @@ dependencies:
   dotted_border: ^2.0.0-nullsafety.0
 
   intl: ^0.17.0
-
-  image_editor: any
 
   carousel_slider: ^4.0.0-nullsafety.0
 

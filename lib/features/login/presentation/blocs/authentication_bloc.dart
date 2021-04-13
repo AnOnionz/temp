@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:localstorage/localstorage.dart';
 import 'package:meta/meta.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sp_bill/core/common/keys.dart';
@@ -14,16 +15,16 @@ part 'authentication_state.dart';
 
 class AuthenticationBloc
     extends Bloc<AuthenticationEvent, AuthenticationState> {
-  AuthenticationBloc({required this.preferences}) : super(AuthenticationInitial());
+  AuthenticationBloc({required this.localStorage}) : super(AuthenticationInitial());
 
-  final SharedPreferences preferences;
+  final LocalStorage  localStorage;
   @override
   Stream<AuthenticationState> mapEventToState(
     AuthenticationEvent event,
   ) async* {
     if (event is AppStarted) {
       try {
-          String? user = preferences.getString(USER);
+          String? user = localStorage.getItem(USER);
           if (user != null) {
           print('User:' + user);
           Future.delayed(Duration.zero);
@@ -40,18 +41,18 @@ class AuthenticationBloc
 
     if (event is LoggedIn) {
       yield AuthenticationLoading();
-      preferences.setString(USER, jsonEncode(event.loginEntity.toJson()));
+      localStorage.setItem(USER, jsonEncode(event.loginEntity.toJson()));
       Future.delayed(Duration.zero);
       yield AuthenticationAuthenticated(user: event.loginEntity);
     }
 
     if (event is LoggedOut) {
-      preferences.remove(USER);
+      localStorage.deleteItem(USER);
       yield AuthenticationUnauthenticated();
     }
   }
  Future<LoginEntity> getUser() async{
-   final jsonString = preferences.getString(USER);
+   final jsonString = localStorage.getItem(USER);
    return LoginModel.fromJson(jsonDecode(jsonString!));
  }
 

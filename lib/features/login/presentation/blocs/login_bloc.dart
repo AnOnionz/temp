@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:sp_bill/core/common/keys.dart';
 import 'package:sp_bill/core/error/failure.dart';
-import 'package:sp_bill/core/usecases/usecase.dart';
 import 'package:sp_bill/features/login/domain/entities/login_entity.dart';
 import 'package:sp_bill/features/login/domain/usecases/usecase_login.dart';
 import 'package:sp_bill/features/login/domain/usecases/usecase_logout.dart';
@@ -38,7 +37,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       yield* _eitherLoginOrErrorState(loginUseCase,);
     }
     if (event is LogoutButtonPress) {
-      authenticationBloc.preferences.remove(USER);
+      authenticationBloc.localStorage.deleteItem(USER);
       authenticationBloc.add(LoggedOut());
     }
   }
