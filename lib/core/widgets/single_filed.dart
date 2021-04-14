@@ -6,9 +6,10 @@ class SingleField  extends StatelessWidget {
   final String label;
   final double width;
   final bool small;
-  final bool? disable;
+  final bool disable;
+  final TextEditingController? controller;
 
-  const SingleField({Key? key, required this.label, required this.width, this.small = false, this.disable= false}) : super(key: key);
+  const SingleField({Key? key, required this.label, required this.width, this.small = false, this.disable= false, this.controller}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -23,11 +24,12 @@ class SingleField  extends StatelessWidget {
             height: 37,
             width: width,
             child: TextFormField(
-              enabled: !disable!,
+              enabled: !disable,
+              controller: controller,
               decoration: InputDecoration(
                 filled: true,
-                fillColor:  Colors.white,
-                suffixIcon: disable ?? false ? Padding(
+                fillColor: Colors.white,
+                suffixIcon: disable ? Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Image.asset('assets/images/denied.png', height: 13, width: 13,),
                 ) : null,

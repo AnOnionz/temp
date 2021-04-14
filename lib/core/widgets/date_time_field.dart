@@ -5,8 +5,10 @@ import '../../core/common/constants.dart';
 class DateTimeField extends StatefulWidget {
   final String label;
   final double width;
+  final VoidCallback onTap;
+  final TextEditingController controller;
 
-  const DateTimeField({Key? key, required this.label, required this.width})
+  const DateTimeField({Key? key, required this.label, required this.width, required this.onTap, required this.controller})
       : super(key: key);
 
   @override
@@ -14,8 +16,6 @@ class DateTimeField extends StatefulWidget {
 }
 
 class _DateTimeFieldState extends State<DateTimeField> {
-  TextEditingController _controller = TextEditingController();
-  DateTimeRange _selectedDate = DateTimeRange(start: DateTime.now(), end:DateTime.now());
 
   @override
   Widget build(BuildContext context) {
@@ -36,25 +36,9 @@ class _DateTimeFieldState extends State<DateTimeField> {
             style: TextStyle(
               fontSize: 15
             ),
-            controller: _controller,
-            onTap: () async {
-              final rangeDate = await showDateRangePicker(
-                  context: context,
-                  firstDate: DateTime(1900),
-                  lastDate: DateTime(2100),
-                  useRootNavigator: true,
-                  locale: Locale('vi','VN'),
-              );
-              if(rangeDate != null && rangeDate != _selectedDate){
-                setState(() {
-                  _selectedDate = rangeDate;
-                });
-                _controller.text =  DateFormat('dd/MM/yyyy').format(rangeDate.start).toString()+ ' - ' +
-                    DateFormat('dd/MM/yyyy').format(rangeDate.end).toString();
-              }
-            },
+            controller: widget.controller,
+            onTap: widget.onTap,
             decoration: InputDecoration(
-
               filled: true,
               fillColor:  Colors.white,
               suffixIcon: Icon(Icons.date_range_outlined, size: 25, color: Colors.black45,),

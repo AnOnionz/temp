@@ -6,16 +6,17 @@ class DropdownField extends StatefulWidget {
   final String label;
   final double width;
   final bool small;
-  final List<UserEntity>? data;
-  int? selectedID;
+  final bool disable;
+  final Widget child;
+
 
   DropdownField(
       {Key? key,
       required this.label,
       required this.width,
-      this.selectedID = 0,
       this.small = false,
-      this.data})
+        this.disable = false,
+        required this.child})
       : super(key: key);
 
   @override
@@ -41,14 +42,14 @@ class _DropdownFieldState extends State<DropdownField> {
         height: 37,
         width: widget.width,
         child: FormField<String>(
-          initialValue: widget.data!.isNotEmpty ? 'Tất cả' : 'Không có user',
+          enabled: !widget.disable,
           builder: (FormFieldState<String> state) {
             return InputDecorator(
               decoration: InputDecoration(
                 filled: true,
                 fillColor: Colors.white,
                 contentPadding:
-                    const EdgeInsets.symmetric(vertical: 6.0, horizontal: 10.0),
+                    const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(5.0),
                     borderSide: BorderSide(
@@ -63,28 +64,7 @@ class _DropdownFieldState extends State<DropdownField> {
                     )),
               ),
               isEmpty: selectedItem == '',
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  icon: Icon(Icons.keyboard_arrow_down),
-                  value: selectedItem,
-                  isDense: true,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      if(newValue!=null) {
-                        selectedItem = newValue;
-                        widget.selectedID = int.parse(newValue);
-                        state.didChange(newValue);
-                      }
-                    });
-                  },
-                  items: widget.data!.map((UserEntity user) {
-                    return DropdownMenuItem<String>(
-                      value: user.id.toString(),
-                      child: Text(user.userName),
-                    );
-                  }).toList(),
-                ),
-              ),
+              child: widget.child,
             );
           },
         ),

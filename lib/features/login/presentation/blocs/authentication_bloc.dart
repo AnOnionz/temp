@@ -3,8 +3,6 @@ import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:localstorage/localstorage.dart';
-import 'package:meta/meta.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sp_bill/core/common/keys.dart';
 import 'package:sp_bill/features/login/data/model/login_model.dart';
 import 'package:sp_bill/features/login/domain/entities/login_entity.dart';
@@ -24,7 +22,9 @@ class AuthenticationBloc
   ) async* {
     if (event is AppStarted) {
       try {
+          await localStorage.ready;
           String? user = localStorage.getItem(USER);
+          print(user);
           if (user != null) {
           print('User:' + user);
           Future.delayed(Duration.zero);
@@ -42,6 +42,7 @@ class AuthenticationBloc
     if (event is LoggedIn) {
       yield AuthenticationLoading();
       localStorage.setItem(USER, jsonEncode(event.loginEntity.toJson()));
+      print('adsads+ ${localStorage.getItem(USER)}');
       Future.delayed(Duration.zero);
       yield AuthenticationAuthenticated(user: event.loginEntity);
     }
@@ -51,10 +52,6 @@ class AuthenticationBloc
       yield AuthenticationUnauthenticated();
     }
   }
- Future<LoginEntity> getUser() async{
-   final jsonString = localStorage.getItem(USER);
-   return LoginModel.fromJson(jsonDecode(jsonString!));
- }
 
 
 }

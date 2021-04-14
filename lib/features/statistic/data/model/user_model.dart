@@ -6,17 +6,13 @@ class UserModel extends UserEntity {
   UserModel({
     required int id,
     required String userName,
-    required int total,
-    required int done,
 
-  }): super(id: id, userName: userName, done: done, total: total);
+  }): super(id: id, userName: userName,);
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      id: json['user_id'] as int,
+      id: json['id'] as int,
       userName: json['username'],
-      total: json['total'],
-      done: json['done']
     );
   }
 }

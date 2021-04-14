@@ -3,7 +3,7 @@ import 'package:sp_bill/core/common/constants.dart';
 import 'package:sp_bill/features/statistic/domain/entities/bill.dart';
 
 class FormInfo extends StatelessWidget {
-  final Bill bill;
+  final BillEntity bill;
 
   const FormInfo({Key? key, required this.bill}) : super(key: key);
   @override
@@ -20,7 +20,7 @@ class FormInfo extends StatelessWidget {
           Spacer(),
           Text('Tổng tiền: ', style: kBlackBigText,),
           const SizedBox(width: 18.0,),
-          Text('${bill.totalPrice} VND', style: TextStyle(color: kRedColor, fontSize: 20),),
+          Text('${bill.totalBill} VND', style: TextStyle(color: kRedColor, fontSize: 20),),
         ],
 
       ),

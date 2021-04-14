@@ -63,12 +63,14 @@ class Edit extends StatelessWidget {
                                 ),
                               ),
                               FormInfo(
-                                bill: Bill(
-                                    id: '312321',
+                                bill: BillEntity(
+                                    id: 312321,
                                     outletCode: '3203332321',
-                                    totalPrice: '15.000.000',
-                                    user: 'KhiemDang',
-                                    createAt: '10/4/2021 8:30',
+                                    totalBill: 2321333233,
+                                    userName: 'KhiemDang',
+                                    doneAt: '10/4/2021 8:30',
+                                    outletName: 'adadgsad',
+                                    token: 'token',
                                     status: NO_INPUT),
                               ),
                               BillInputForm(

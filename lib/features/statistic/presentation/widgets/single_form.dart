@@ -25,7 +25,32 @@ class SingleForm extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 SingleField(label: 'Tên sản phẩm', width: size.width / 5 -20, small: true,),
-                DropdownField(label: 'Ngành hàng', width: size.width / 9 -20 ,small: true,),
+                // DropdownField(label: 'Ngành hàng', width: size.width / 9 -20 ,small: true,
+                //   child: DropdownButtonHideUnderline(
+                //     child: DropdownButton<String>(
+                //       icon: Icon(Icons.keyboard_arrow_down),
+                //       value: selectedUser,
+                //       isDense: true,
+                //       onChanged: (String? newValue) {
+                //         setState(() {
+                //           if(newValue!=null) {
+                //             selectedUser = newValue;
+                //           }
+                //         });
+                //       },
+                //       items:state.users.map((UserEntity user) {
+                //         return DropdownMenuItem<String>(
+                //           value: user.id.toString(),
+                //           child: Text(user.userName),
+                //           onTap: () {
+                //             setState(() {
+                //               selectedId = user.id;
+                //             });
+                //           },
+                //         );
+                //       }).toList(),
+                //     ),
+                //   ),),
                 SingleField(label: 'Số lượng', width: size.width / 12 - 20, small: true,),
                 SingleField(label: 'Đơn vị tính', width: size.width / 12 - 20, small: true,),
                 SingleField(label: 'Đơn giá', width: size.width / 12 - 20, small: true,),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 import 'package:sp_bill/features/login/presentation/blocs/login_bloc.dart';
 import '../../core/common/constants.dart';
 import '../../core/widgets/logout_btn.dart';
@@ -29,7 +30,7 @@ class NavBar extends StatelessWidget {
           MenuItem(title: 'Thống kê', route: '/statistic', isActive: index == 5,),
           const Spacer(),
           UserInfo(name: userName),
-          LogoutButton(onPressed: (){BlocProvider.of<LoginBloc>(context).add(LogoutButtonPress());}),
+          LogoutButton(onPressed: (){Modular.get<LoginBloc>().add(LogoutButtonPress());}),
           const SizedBox(width: 10,),
         ],
       ),
