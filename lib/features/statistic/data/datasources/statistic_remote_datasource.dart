@@ -1,7 +1,9 @@
 import 'package:sp_bill/core/api/myDio.dart';
+import 'package:sp_bill/features/statistic/data/model/bill_detail_model.dart';
 import 'package:sp_bill/features/statistic/data/model/bill_response_model.dart';
 import 'package:sp_bill/features/statistic/data/model/user_bill_response_model.dart';
 import 'package:sp_bill/features/statistic/data/model/user_model.dart';
+import 'package:sp_bill/features/statistic/domain/entities/bill_detail.dart';
 import 'package:sp_bill/features/statistic/domain/entities/bill_response.dart';
 import 'package:sp_bill/features/statistic/domain/entities/user.dart';
 import 'package:sp_bill/features/statistic/domain/entities/user_bill_response.dart';
@@ -10,6 +12,7 @@ abstract class StatisticRemoteDataSource {
   Future<List<UserEntity>> fetchAllUser();
   Future<UserBillResponse> fetchAllUserBill({int? begin,int? end, int? userId});
   Future<BillResponse> fetchAllBill({int? begin, int? end, int? status, int? billId, String? outletCode, required int userId,int? page});
+  Future<BillDetailEntity> fetchBillDetail({required String token});
 }
 
 class StatisticRemoteDataSourceImpl implements StatisticRemoteDataSource{
@@ -53,5 +56,12 @@ class StatisticRemoteDataSourceImpl implements StatisticRemoteDataSource{
     Response _resp = await cDio.getResponse(path: 'supervisor/statistic-bill', data: params);
     print(_resp);
     return BillResponseModel.fromJson(_resp.data);
+  }
+
+  @override
+  Future<BillDetailEntity> fetchBillDetail({required String token}) async{
+    Response _resp = await cDio.getResponse(path: 'bill/$token');
+    print(_resp);
+    return BillDetailModel.fromJson(_resp.data);
   }
 }
