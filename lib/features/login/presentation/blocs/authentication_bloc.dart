@@ -42,7 +42,6 @@ class AuthenticationBloc
     if (event is LoggedIn) {
       yield AuthenticationLoading();
       localStorage.setItem(USER, jsonEncode(event.loginEntity.toJson()));
-      print('adsads+ ${localStorage.getItem(USER)}');
       Future.delayed(Duration.zero);
       yield AuthenticationAuthenticated(user: event.loginEntity);
     }

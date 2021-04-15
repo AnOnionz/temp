@@ -21,7 +21,7 @@ class InternalFailure extends Failure{
 }
 // ignore: must_be_immutable
 class UnAuthenticateFailure extends Failure{
-  UnAuthenticateFailure(): super("Phiên đăng nhập đã hết hạn ");
+  UnAuthenticateFailure(): super("Phiên đăng nhập đã hết hạn");
 
 }
 // ignore: must_be_immutable

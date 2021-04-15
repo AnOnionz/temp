@@ -14,7 +14,9 @@ import 'package:sp_bill/features/statistic/data/repositories/statistic_repositor
 import 'package:sp_bill/features/statistic/domain/usecases/fetch_all_bill_usecase.dart';
 import 'package:sp_bill/features/statistic/domain/usecases/fetch_all_user_bill_usecase.dart';
 import 'package:sp_bill/features/statistic/domain/usecases/fetch_all_user_usecase.dart';
+import 'package:sp_bill/features/statistic/domain/usecases/fetch_bill_detail_usecase.dart';
 import 'package:sp_bill/features/statistic/presentation/bloc/bill_cubit.dart';
+import 'package:sp_bill/features/statistic/presentation/bloc/bill_detail_cubit.dart';
 import 'package:sp_bill/features/statistic/presentation/bloc/userbill_cubit.dart';
 import 'package:sp_bill/features/statistic/presentation/bloc/users_cubit.dart';
 import 'home_module.dart';
@@ -35,10 +37,12 @@ class AppModule extends Module {
     Bind.lazySingleton((i) => UsersCubit(fetchAllUser: i.get<FetchAllUserUseCase>())),
     Bind.lazySingleton((i) => UserBillCubit(fetchAllUserBill: i.get<FetchAllUserBillUseCase>())),
     Bind.lazySingleton((i) => BillCubit(fetchAllBill: i.get<FetchAllBillUseCase>())),
+    Bind.factory((i) => BillDetailCubit(fetchBillDetail: i.get<FetchBillDetailUseCase>())),
     Bind.lazySingleton((i) => FetchAllUserUseCase(repository: i.get<StatisticRepositoryImpl>())),
     Bind.lazySingleton((i) => FetchAllUserBillUseCase(repository: i.get<StatisticRepositoryImpl>())),
     Bind.lazySingleton((i) => FetchAllBillUseCase(repository: i.get<StatisticRepositoryImpl>())),
-    Bind.lazySingleton((i) => StatisticRepositoryImpl(remoteDataSource: i.get<StatisticRemoteDataSourceImpl>())),
+    Bind.lazySingleton((i) => FetchBillDetailUseCase(repository: i.get<StatisticRepositoryImpl>())),
+    Bind.lazySingleton((i) => StatisticRepositoryImpl(remoteDataSource: i.get<StatisticRemoteDataSourceImpl>(),authenticationBloc: i.get<AuthenticationBloc>())),
     Bind.lazySingleton((i) => StatisticRemoteDataSourceImpl(cDio: i.get<CDio>())),
 
   ];

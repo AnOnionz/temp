@@ -11,7 +11,7 @@ class LogoutButton extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Container(
-          child: Image.asset('assets/images/logout.png', height: 15,),
+          child: Icon(Icons.logout, size: 30,color: Colors.white ,),
         ),
       ),
     );

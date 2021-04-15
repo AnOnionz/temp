@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import '../../../../core/common/constants.dart';
-import '../../../../core/widgets/dropdown_field.dart';
+import 'package:sp_bill/core/utils/string_tranform.dart';
+import 'package:sp_bill/features/statistic/domain/entities/industry.dart';
 import '../../../../core/widgets/single_filed.dart';
 
 // ignore: must_be_immutable
 class SingleForm extends StatelessWidget {
-  final bool isFirst;
-  VoidCallback? onDelete;
+  final IndustryEntity industry;
 
-  SingleForm({Key? key, this.isFirst = false}) : super(key: key);
+  SingleForm({Key? key, required this.industry}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +23,7 @@ class SingleForm extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                SingleField(label: 'Tên sản phẩm', width: size.width / 5 -20, small: true,),
+                SingleField(label: 'Tên sản phẩm', width: size.width / 5 -20, small: true, disable:true, initValue: industry.productName,),
                 // DropdownField(label: 'Ngành hàng', width: size.width / 9 -20 ,small: true,
                 //   child: DropdownButtonHideUnderline(
                 //     child: DropdownButton<String>(
@@ -51,19 +50,12 @@ class SingleForm extends StatelessWidget {
                 //       }).toList(),
                 //     ),
                 //   ),),
-                SingleField(label: 'Số lượng', width: size.width / 12 - 20, small: true,),
-                SingleField(label: 'Đơn vị tính', width: size.width / 12 - 20, small: true,),
-                SingleField(label: 'Đơn giá', width: size.width / 12 - 20, small: true,),
-                SingleField(label: 'Tổng tiền', width: size.width / 12 - 20, small: true, disable: true,),
+                SingleField(label: 'Số lượng', width: size.width / 12 - 20, small: true,disable: true,initValue: industry.qty==null?'':industry.qty.toString()),
+                SingleField(label: 'Đơn vị tính', width: size.width / 12 - 20, small: true,disable: true,initValue: industry.unit??'',),
+                SingleField(label: 'Đơn giá', width: size.width / 12 - 20, small: true,disable:true,initValue: industry.unitPrince==null ? "" : industry.unitPrince.toString() ,),
+                SingleField(label: 'Tổng tiền', width: size.width / 12 - 20, small: true, disable: true, initValue: industry.unitPrince==null || industry.qty==null ? "" : displayPrice(industry.unitPrince! * industry.qty!,)),
               ],
             ),
-            const SizedBox(height: 17,),
-            !isFirst ? Align(
-              alignment: Alignment.bottomRight,
-              child: InkWell(
-                  onTap: onDelete??(){},
-                  child: Text('Xóa sản phẩm', style: kRedSmallText,)),
-            ): const SizedBox(),
             const SizedBox(height: 19.0,),
           ],
         ),

@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:sp_bill/core/error/Exception.dart';
 import 'package:sp_bill/core/error/failure.dart';
+import 'package:sp_bill/features/login/presentation/blocs/authentication_bloc.dart';
 import 'package:sp_bill/features/statistic/data/datasources/statistic_remote_datasource.dart';
 import 'package:sp_bill/features/statistic/domain/entities/bill_detail.dart';
 import 'package:sp_bill/features/statistic/domain/entities/bill_response.dart';
@@ -10,8 +11,9 @@ import 'package:sp_bill/features/statistic/domain/repositories/statistic_reposit
 
 class StatisticRepositoryImpl implements StatisticRepository{
   final StatisticRemoteDataSource remoteDataSource;
+  final AuthenticationBloc authenticationBloc;
 
-  StatisticRepositoryImpl({required this.remoteDataSource,});
+  StatisticRepositoryImpl({required this.remoteDataSource,required this.authenticationBloc});
 
   @override
   Future<Either<Failure, List<UserEntity>>> fetchAllUser() async {
@@ -21,6 +23,7 @@ class StatisticRepositoryImpl implements StatisticRepository{
     } on InternetException catch(_){
       return Left(InternetFailure());
     } on UnAuthenticateException catch (_) {
+      authenticationBloc.add(LoggedOut());
       return Left(UnAuthenticateFailure());
     } on ResponseException catch (error) {
       return Left(ResponseFailure(message: error.message));
@@ -37,6 +40,7 @@ class StatisticRepositoryImpl implements StatisticRepository{
     } on InternetException catch(_){
       return Left(InternetFailure());
     } on UnAuthenticateException catch (_) {
+      authenticationBloc.add(LoggedOut());
       return Left(UnAuthenticateFailure());
     } on ResponseException catch (error) {
       return Left(ResponseFailure(message: error.message));
@@ -53,6 +57,7 @@ class StatisticRepositoryImpl implements StatisticRepository{
     } on InternetException catch(_){
       return Left(InternetFailure());
     } on UnAuthenticateException catch (_) {
+      authenticationBloc.add(LoggedOut());
       return Left(UnAuthenticateFailure());
     } on ResponseException catch (error) {
       return Left(ResponseFailure(message: error.message));
@@ -69,6 +74,7 @@ class StatisticRepositoryImpl implements StatisticRepository{
     } on InternetException catch(_){
       return Left(InternetFailure());
     } on UnAuthenticateException catch (_) {
+      authenticationBloc.add(LoggedOut());
       return Left(UnAuthenticateFailure());
     } on ResponseException catch (error) {
       return Left(ResponseFailure(message: error.message));

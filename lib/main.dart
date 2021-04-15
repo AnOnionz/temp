@@ -5,6 +5,7 @@ import 'package:sp_bill/simple_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:url_strategy/url_strategy.dart';
+import 'core/utils/string_tranform.dart';
 import 'route/app_module.dart';
 
 Future<void> main() async {
@@ -34,7 +35,6 @@ class App extends StatelessWidget {
       title: "SP BILL",
       theme: ThemeData(primarySwatch: Colors.teal),
       builder: builder,
-
     ).modular();
   }
 }

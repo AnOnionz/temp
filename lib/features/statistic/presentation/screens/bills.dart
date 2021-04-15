@@ -1,14 +1,17 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:intl/intl.dart';
+import 'package:sp_bill/core/utils/string_tranform.dart';
 import 'package:sp_bill/core/widgets/date_time_field.dart';
 import 'package:sp_bill/core/widgets/dropdown_field.dart';
 import 'package:sp_bill/core/widgets/hover_button.dart';
 import 'package:sp_bill/core/widgets/pagination.dart';
 import 'package:sp_bill/core/widgets/single_filed.dart';
+import 'package:sp_bill/features/login/presentation/blocs/authentication_bloc.dart';
 import 'package:sp_bill/features/statistic/domain/entities/bill.dart';
 import 'package:sp_bill/features/statistic/presentation/bloc/bill_cubit.dart';
 import 'package:sp_bill/features/statistic/presentation/bloc/users_cubit.dart';
@@ -71,7 +74,7 @@ class _BillsState extends State<Bills> {
       desktop: Column(
         children: [
           NavBar(
-            userName: 'Thong',
+            userName: (Modular.get<AuthenticationBloc>().state as AuthenticationAuthenticated).user.userName,
             index: 5,
           ),
           Expanded(
@@ -85,20 +88,36 @@ class _BillsState extends State<Bills> {
                   Padding(
                     padding: const EdgeInsets.only(top: 30),
                     child: FractionallySizedBox(
-                      widthFactor: 6 / 8,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                      widthFactor: 6 / 8 + .03,
+                      child: Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.end,
                         children: [
                           SingleField(
                             label: 'ID phiếu',
                             width: size.width / 8,
                             controller: _billIDController,
+                            inputFormatter: <TextInputFormatter>[
+                              LengthLimitingTextInputFormatter(
+                                  15),
+                              FilteringTextInputFormatter
+                                  .digitsOnly,
+                              FilteringTextInputFormatter
+                                  .allow(RegExp(r'[0-9]'))
+                            ],
+
                           ),
                           SingleField(
                             label: 'Outlet code',
                             width: size.width / 8,
                             controller: _outletCodeController,
+                            inputFormatter: <TextInputFormatter>[
+                              LengthLimitingTextInputFormatter(
+                                  15),
+                              FilteringTextInputFormatter
+                                  .digitsOnly,
+                              FilteringTextInputFormatter
+                                  .allow(RegExp(r'[0-9]'))
+                            ],
                           ),
                           DropdownField(
                             label: 'User nhập liệu',
@@ -167,9 +186,16 @@ class _BillsState extends State<Bills> {
                               }
                             },
                           ),
-                        DropdownField(label: 'Tình trạng' ,width: 230, child: DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          icon: Icon(Icons.keyboard_arrow_down),
+                        DropdownField(label: 'Tình trạng' ,width: 230,
+                          child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                          icon: InkWell(
+                            onTap: (){
+                              setState(() {
+                                _selectedStatus = null;
+                              });
+                            },
+                              child:_selectedStatus!=null ? Icon(Icons.close, size: 20,) : Icon(Icons.keyboard_arrow_down)),
                           isDense: true,
                           value: _selectedStatus,
                           onChanged: (String? newValue) {
@@ -193,144 +219,150 @@ class _BillsState extends State<Bills> {
                           ),
                          ),
                         ),
-                          ElevatedButton(
-                            onPressed: () {
-                              billCubit.fetchBill(
-                                userId: int.parse(widget.id),
-                                outletCode: _outletCodeController.text.isEmpty? null :_outletCodeController.text ,
-                                billId: _billIDController.text.isEmpty ? null :int.parse(_billIDController.text),
-                                begin: _selectedDate != null ? _selectedDate!.start.millisecondsSinceEpoch ~/1000 : null,
-                                end: _selectedDate != null ? _selectedDate!.end.millisecondsSinceEpoch ~/1000 : null,
-                                status: _selectedStatus != null ? int.parse(_selectedStatus!) : null,
-                              );
-                            },
-                            child: Text(
-                              'Tìm',
-                              style: kBlackSmallText,
-                            ),
-                            style: ElevatedButton.styleFrom(
-                                primary: kGreyColor, // background
-                                onPrimary: kGreenColor,
-                                elevation: 0,
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 40, vertical: 16) // foreground
-                                ),
-                          ),
+
+                         ElevatedButton(
+                           onPressed: () {
+                             billCubit.fetchBill(
+                               userId: int.parse(widget.id),
+                               outletCode: _outletCodeController.text.isEmpty? null :_outletCodeController.text ,
+                               billId: _billIDController.text.isEmpty ? null :int.parse(_billIDController.text),
+                               begin: _selectedDate != null ? _selectedDate!.start.millisecondsSinceEpoch ~/1000 : null,
+                               end: _selectedDate != null ? _selectedDate!.end.millisecondsSinceEpoch ~/1000 : null,
+                               status: _selectedStatus != null ? int.parse(_selectedStatus!) : null,
+                             );
+                           },
+                           child: Text(
+                             'Tìm',
+                             style: kBlackSmallText,
+                           ),
+                           style: ElevatedButton.styleFrom(
+                               primary: kGreyColor, // background
+                               onPrimary: kGreenColor,
+                               elevation: 0,
+                               padding: const EdgeInsets.symmetric(
+                                   horizontal: 40, vertical: 16) // foreground
+                               ),
+                         )
                         ],
                       ),
+                    ),
+                  ),
+                  Expanded(
+                    child: BlocBuilder<BillCubit, BillState>(
+                      bloc: billCubit,
+                      builder: (context, state) {
+                        if (state is BillLoaded) {
+                          data = state.response.bills;
+                          return JDataTable(
+                            // label: 'Kết quả: ',
+                            // value: state.response.,
+                            // labelStyle: kRedText,
+                            // valueStyle: kRedText,
+                            maxHeight: size.height - 415,
+                            headerData: _header,
+                            body: data.isNotEmpty ? ListView.separated(
+                              controller: _scrollController,
+                              separatorBuilder: (context, index) => Divider(
+                                color: kGreyColor,
+                              ),
+                              itemBuilder: (context, index) => Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 7.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container(
+                                        width: size.width / 25,
+                                        child: Text('${index + 1}')),
+                                    Container(
+                                        width: size.width / 10,
+                                        child: Text(
+                                          data[index].id.toString(),
+                                          style: kBlackSmallText,
+                                        )),
+                                    Container(
+                                        width: size.width / 10,
+                                        child: Text(
+                                          data[index].outletCode,
+                                          style: kBlackSmallText,
+                                        )),
+                                    Container(
+                                        width: size.width / 7,
+                                        child: Text(
+                                          data[index].outletName,
+                                          style: kBlackSmallText,
+                                        )),
+                                    Container(
+                                        width: size.width / 10,
+                                        child: Text(
+                                          displayPrice(data[index].totalBill),
+                                          style: kBlackSmallText,
+                                        )),
+                                    Container(
+                                        width: size.width / 10,
+                                        child: Text(
+                                          data[index].userName,
+                                          style: kBlackSmallText,
+                                        )),
+                                    Container(
+                                        width: size.width / 10,
+                                        child: Text(
+                                          data[index].doneAt,
+                                          style: kBlackSmallText,
+                                        )),
+                                    Container(
+                                        width: size.width / 10,
+                                        child: StatusBill(
+                                            status: data[index].status)),
+                                    Container(
+                                        width: size.width / 25,
+                                        child: Center(
+                                          child: HoverButton(
+                                            onPressed: () {
+                                              Modular.to.pushNamed(
+                                                  '/bill/${data[index].token}');
+                                            },
+                                            icon: Image.asset(
+                                              'assets/images/edit.png',
+                                              height: 16,
+                                              width: 16,
+                                            ),
+                                            onActive: Image.asset(
+                                              'assets/images/edit_hover.png',
+                                              height: 16,
+                                              width: 16,
+                                            ),
+                                          ),
+                                        )),
+                                  ],
+                                ),
+                              ),
+                              itemCount: data.length,
+                              shrinkWrap: true,
+                            ): Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 30),
+                              child: Text('Không có dữ liệu', style: kGreySmallText,),
+                            ),
+                          );
+                        }
+                        return JDataTable(
+                          // label: 'Kết quả: ',
+                          // value: 0,
+                          // labelStyle: kRedText,
+                          // valueStyle: kRedText,
+                          maxHeight: size.height * 0.6,
+                          headerData: _header,
+                          body: Center(child: Container(height: 60, width: 60, child: CircularProgressIndicator(),),)
+                        );
+                      },
                     ),
                   ),
                   BlocBuilder<BillCubit, BillState>(
                     bloc: billCubit,
                     builder: (context, state) {
-                      if (state is BillLoaded) {
-                        data = state.response.bills;
-                        return JDataTable(
-                          // label: 'Kết quả: ',
-                          // value: state.response.,
-                          // labelStyle: kRedText,
-                          // valueStyle: kRedText,
-                          maxHeight: size.height * 0.6,
-                          headerData: _header,
-                          body: ListView.separated(
-                            controller: _scrollController,
-                            separatorBuilder: (context, index) => Divider(
-                              color: kGreyColor,
-                            ),
-                            itemBuilder: (context, index) => Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 7.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                      width: size.width / 25,
-                                      child: Text('${index + 1}')),
-                                  Container(
-                                      width: size.width / 10,
-                                      child: Text(
-                                        data[index].id.toString(),
-                                        style: kBlackSmallText,
-                                      )),
-                                  Container(
-                                      width: size.width / 10,
-                                      child: Text(
-                                        data[index].outletCode,
-                                        style: kBlackSmallText,
-                                      )),
-                                  Container(
-                                      width: size.width / 7,
-                                      child: Text(
-                                        data[index].outletName,
-                                        style: kBlackSmallText,
-                                      )),
-                                  Container(
-                                      width: size.width / 10,
-                                      child: Text(
-                                        data[index].totalBill.toString(),
-                                        style: kBlackSmallText,
-                                      )),
-                                  Container(
-                                      width: size.width / 10,
-                                      child: Text(
-                                        data[index].userName,
-                                        style: kBlackSmallText,
-                                      )),
-                                  Container(
-                                      width: size.width / 10,
-                                      child: Text(
-                                        data[index].doneAt,
-                                        style: kBlackSmallText,
-                                      )),
-                                  Container(
-                                      width: size.width / 10,
-                                      child: StatusBill(
-                                          status: data[index].status)),
-                                  Container(
-                                      width: size.width / 25,
-                                      child: Center(
-                                        child: HoverButton(
-                                          onPressed: () {
-                                            Modular.to.pushNamed(
-                                                '/statistic/${data[index].id}/edit');
-                                          },
-                                          icon: Image.asset(
-                                            'assets/images/edit.png',
-                                            height: 16,
-                                            width: 16,
-                                          ),
-                                          onActive: Image.asset(
-                                            'assets/images/edit_hover.png',
-                                            height: 16,
-                                            width: 16,
-                                          ),
-                                        ),
-                                      )),
-                                ],
-                              ),
-                            ),
-                            itemCount: data.length,
-                            shrinkWrap: true,
-                          ),
-                        );
-                      }
-                      return JDataTable(
-                        // label: 'Kết quả: ',
-                        // value: 0,
-                        // labelStyle: kRedText,
-                        // valueStyle: kRedText,
-                        maxHeight: size.height * 0.6,
-                        headerData: _header,
-                        body: Center(child: Container(height: 60, width: 60, child: CircularProgressIndicator(),),)
-                      );
-                    },
-                  ),
-                  BlocBuilder<BillCubit, BillState>(
-                    bloc: billCubit,
-                    builder: (context, state) {
                       if(state is BillLoaded){
-                        return Pagination(total: state.response.totalPage, callback: (index) {
+                        return state.response.bills.isNotEmpty && state.response.bills.length >= 20 ? Pagination(total: state.response.totalPage, callback: (index) {
                           billCubit.fetchIndexPage(page: index);
                           setState(() {
                             _scrollController.animateTo(
@@ -339,7 +371,7 @@ class _BillsState extends State<Bills> {
                               duration: const Duration(milliseconds: 100),
                             );
                           });
-                        },);
+                        },) : Container();
                       }
                       return Container();
                     },

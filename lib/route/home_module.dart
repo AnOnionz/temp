@@ -18,8 +18,8 @@ class HomeModule extends Module {
     ChildRoute('/login', child: (_, args) => LoginPage()),
     ChildRoute('/statistic', child: (_, args) => AuthenticateWidget(child: Users()),),
     ChildRoute(
-      '/statistic/:id/edit',
-      child: (_, args) => AuthenticateWidget(child: Edit(id: args.params['id'])),
+      '/bill/:token',
+      child: (_, args) => AuthenticateWidget(child: Edit(token: args.params['token'])),
     ),
     ChildRoute(
       '/statistic/:id',

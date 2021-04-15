@@ -1,4 +1,5 @@
 import 'package:sp_bill/core/api/myDio.dart';
+import 'package:sp_bill/features/login/presentation/blocs/authentication_bloc.dart';
 import 'package:sp_bill/features/statistic/data/model/bill_detail_model.dart';
 import 'package:sp_bill/features/statistic/data/model/bill_response_model.dart';
 import 'package:sp_bill/features/statistic/data/model/user_bill_response_model.dart';
@@ -18,13 +19,14 @@ abstract class StatisticRemoteDataSource {
 class StatisticRemoteDataSourceImpl implements StatisticRemoteDataSource{
   final CDio cDio;
 
+
   StatisticRemoteDataSourceImpl({required this.cDio});
 
   @override
   Future<List<UserEntity>> fetchAllUser() async  {
     Response _resp = await cDio.getResponse(path: 'home/users',);
     print(_resp);
-     return (_resp.data as List<dynamic>).map((e) => UserModel.fromJson(e)).toList();
+    return (_resp.data as List<dynamic>).map((e) => UserModel.fromJson(e)).toList();
   }
 
   @override
@@ -60,8 +62,8 @@ class StatisticRemoteDataSourceImpl implements StatisticRemoteDataSource{
 
   @override
   Future<BillDetailEntity> fetchBillDetail({required String token}) async{
-    Response _resp = await cDio.getResponse(path: 'bill/$token');
-    print(_resp);
+    Response _resp = await cDio.getResponse(path: 'bill/detail?billToken=$token');
+    print('response: $_resp');
     return BillDetailModel.fromJson(_resp.data);
   }
 }

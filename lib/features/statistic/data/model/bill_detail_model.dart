@@ -1,4 +1,6 @@
+import 'package:sp_bill/features/statistic/data/model/industry_moel.dart';
 import 'package:sp_bill/features/statistic/domain/entities/bill_detail.dart';
+import 'package:sp_bill/features/statistic/domain/entities/industry.dart';
 
 class BillDetailModel extends BillDetailEntity{
   BillDetailModel({
@@ -8,7 +10,7 @@ class BillDetailModel extends BillDetailEntity{
     required String outletCode,
     required String outletName,
     required String token,
-    required List<dynamic> detail,
+    required List<IndustryEntity> detail,
     required List<String> imageUrls,
 }) : super(
     id: id,
@@ -28,8 +30,8 @@ class BillDetailModel extends BillDetailEntity{
       token: json['bill_token'],
       outletCode: json['outlet_code'],
       outletName: json['outlet_name'],
-      imageUrls: (json['images'] as List<String>),
-      detail: json['details'],
+      imageUrls: (json['images'] as List<dynamic>).map((e) => e.toString()).toList(),
+      detail: (json['details'] as List<dynamic>).map((e) => IndustryModel.fromJson(e)).toList(),
     );
   }
 

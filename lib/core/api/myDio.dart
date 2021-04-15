@@ -23,6 +23,7 @@ class CDio {
 
   Future<Response> getResponse({required String path, Map<String, dynamic>? data}) async {
     try {
+      print('GET ${client.options.baseUrl}$path');
       final response = await client.get(path, queryParameters: data);
         print('GET $path: ${response.data}');
         if (response.statusCode == 200) {
@@ -40,7 +41,6 @@ class CDio {
           throw(ResponseException(
               message: "Đã có lỗi xảy ra (${response.statusCode}) "));
     } on DioError catch (e) {
-      print(2);
       if (e.type == DioErrorType.connectTimeout ||
           e.type == DioErrorType.receiveTimeout) {
         throw(InternetException());
@@ -50,6 +50,7 @@ class CDio {
   }
   Future<Response> postResponse({required String path, dynamic? data}) async{
       try {
+        print('POST ${client.options.baseUrl}$path');
         final response = await client.post(path, data: data);
         print('POST $path: ${response.data}');
         if (response.statusCode == 200 ) {

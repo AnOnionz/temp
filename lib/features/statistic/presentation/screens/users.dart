@@ -1,19 +1,17 @@
-import 'dart:convert';
-import 'dart:math';
+import 'package:supercharged/supercharged.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:intl/intl.dart';
-import 'package:localstorage/localstorage.dart';
-import 'package:sp_bill/core/common/keys.dart';
-import 'package:sp_bill/core/widgets/date_time_field.dart';
-import 'package:sp_bill/core/widgets/dropdown_field.dart';
-import 'package:sp_bill/core/widgets/hover_button.dart';
-import 'package:sp_bill/features/login/presentation/blocs/authentication_bloc.dart';
-import 'package:sp_bill/features/statistic/domain/entities/user.dart';
-import 'package:sp_bill/features/statistic/domain/entities/user_bill.dart';
-import 'package:sp_bill/features/statistic/presentation/bloc/userbill_cubit.dart';
-import 'package:sp_bill/features/statistic/presentation/bloc/users_cubit.dart';
+import '../../../../core/widgets/date_time_field.dart';
+import '../../../../core/widgets/dropdown_field.dart';
+import '../../../../core/widgets/hover_button.dart';
+import '../../../../core/widgets/pagination.dart';
+import '../../../../features/login/presentation/blocs/authentication_bloc.dart';
+import '../../../../features/statistic/domain/entities/user.dart';
+import '../../../../features/statistic/domain/entities/user_bill.dart';
+import '../../../../features/statistic/presentation/bloc/userbill_cubit.dart';
+import '../../../../features/statistic/presentation/bloc/users_cubit.dart';
 import '../../../../core/common/constants.dart';
 import '../../../../core/widgets/data_table.dart';
 import '../../../../core/widgets/nav.dart';
@@ -34,6 +32,7 @@ class _UsersState extends State<Users> {
   DateTimeRange? _selectedDate ;
   int _selectedId = 0;
   String _selectedUser = 'Tất cả';
+  late int _currentPage = 1;
     @override
   void initState() {
     usersCubit.fetchUsers();
@@ -41,7 +40,7 @@ class _UsersState extends State<Users> {
     super.initState();
   }
 
-  late List<UserBillEntity> data;
+  late List<List<UserBillEntity>> data = [];
 
   final _header = {
     '#' : 15,
@@ -134,7 +133,10 @@ class _UsersState extends State<Users> {
                         ),);
                       },),
                       const SizedBox(width: 25),
-                      DateTimeField(label: 'Ngày',width: 230,controller: _controller, onTap: () async {
+                      DateTimeField(
+                        label: 'Ngày',width: 230,
+                        controller: _controller,
+                        onTap: () async {
                             final rangeDate = await showDateRangePicker(
                             context: context,
                             firstDate: DateTime(1900),
@@ -171,65 +173,73 @@ class _UsersState extends State<Users> {
                     ],
                   ),
                 ),
-                BlocBuilder<UserBillCubit, UserBillState>(
-                  bloc: Modular.get<UserBillCubit>(),
-                  builder: (context, state) {
-                    if(state is UserBillLoaded){
-                      data = state.response.userBills;
+                Expanded(
+                  child: BlocBuilder<UserBillCubit, UserBillState>(
+                    bloc: Modular.get<UserBillCubit>(),
+                    builder: (context, state) {
+                      if(state is UserBillLoaded){
+                        data = state.response.userBills.chunked(20).toList();
+                        print(data);
+                        return JDataTable(
+                          label: 'Tổng số phiếu đã nhập liệu: ',
+                          value: data[_currentPage-1].fold(0, (previousValue, element) => previousValue! + element.done),
+                          labelStyle: kBlackBigText,
+                          valueStyle: kRedBigText,
+                          maxHeight: size.height - 415, headerData: _header, body:
+                        ListView.separated(
+                          separatorBuilder: (context, index) => Divider(color: kGreyColor,),
+                          itemBuilder:(context, index) => Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 7.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                    width: size.width /15,
+                                    child: Text('${index +1}')),
+                                Container( width: size.width /7, child: Text(data[_currentPage-1][index].userName, style: kBlackSmallText,)),
+                                Container( width: size.width /7, child: Text(data[_currentPage-1][index].time, style: kBlackSmallText,)),
+                                Container( width: size.width /7, child: Text(data[_currentPage-1][index].done.toString(), style: kBlackSmallText,)),
+                                Container( width: size.width /7, child: Text(data[_currentPage-1][index].imageError.toString(), style: kBlackSmallText,)),
+                                Container( width: size.width /7, child: Text(data[_currentPage-1][index].error.toString(), style: kBlackSmallText,)),
+                                Container( width: size.width/15, child: Center(child:
+                                HoverButton(
+                                  onPressed: (){
+                                    Modular.to.pushNamed('/statistic/${data[_currentPage-1][index].userId}');
+                                  },
+                                  icon: Image.asset('assets/images/asign.png', height: 16, width: 16,),
+                                  onActive: Image.asset('assets/images/asign_hover.png', height: 16, width: 16,),
+                                ),
+                                )
+                                ),
+                              ],
+                            ),
+                          ),
+                          itemCount: data[_currentPage-1].length,
+                          shrinkWrap: true,
+                        ),
+                        );
+                      }
                       return JDataTable(
                         label: 'Tổng số phiếu đã nhập liệu: ',
-                        value: data.fold(0, (previousValue, element) => previousValue! + element.done),
+                        value: 0,
                         labelStyle: kBlackBigText,
                         valueStyle: kRedBigText,
-                        maxHeight: size.height*.6, headerData: _header, body:
-                      ListView.separated(
-                        separatorBuilder: (context, index) => Divider(color: kGreyColor,),
-                        itemBuilder:(context, index) => Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 7.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                  width: size.width /15,
-                                  child: Text('${index +1}')),
-                              Container( width: size.width /7, child: Text(data[index].userName, style: kBlackSmallText,)),
-                              Container( width: size.width /7, child: Text(data[index].time, style: kBlackSmallText,)),
-                              Container( width: size.width /7, child: Text(data[index].done.toString(), style: kBlackSmallText,)),
-                              Container( width: size.width /7, child: Text(data[index].imageError.toString(), style: kBlackSmallText,)),
-                              Container( width: size.width /7, child: Text(data[index].error.toString(), style: kBlackSmallText,)),
-                              Container( width: size.width/15, child: Center(child:
-                              HoverButton(
-                                onPressed: (){
-                                  Modular.to.pushNamed('/statistic/${data[index].userId}');
-                                },
-                                icon: Image.asset('assets/images/asign.png', height: 16, width: 16,),
-                                onActive: Image.asset('assets/images/asign_hover.png', height: 16, width: 16,),
-                              ),
-                              )
-                              ),
-                            ],
-                          ),
-                        ),
-                        itemCount: data.length,
-                        shrinkWrap: true,
-                      ),
+                        maxHeight: size.height - 415, headerData: _header, body:
+                          Center(
+                            child: Container(
+                                width: 60,
+                                height: 60,
+                                child: CircularProgressIndicator()),
+                          )
                       );
-                    }
-                    return JDataTable(
-                      label: 'Tổng số phiếu đã nhập liệu: ',
-                      value: 0,
-                      labelStyle: kBlackBigText,
-                      valueStyle: kRedBigText,
-                      maxHeight: size.height*.6, headerData: _header, body:
-                        Center(
-                          child: Container(
-                              width: 60,
-                              height: 60,
-                              child: CircularProgressIndicator()),
-                        )
-                    );
-                  },
-                )
+                    },
+                  ),
+                ),
+                data.length > 1 ? Pagination(total: 2, callback: (index) {
+                    setState(() {
+                      _currentPage = index;
+                    });
+                  }) : Container(),
               ],
             ),
           ),

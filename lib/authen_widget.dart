@@ -16,8 +16,12 @@ class AuthenticateWidget extends StatelessWidget {
     return Responsive(
         mobile: Container(),
         tablet: Container(),
-        desktop: BlocProvider(
-        create: (context) => Modular.get<AuthenticationBloc>()..add(AppStarted()),
+        desktop: MultiBlocProvider(
+          providers: [
+            BlocProvider<AuthenticationBloc>(
+              create: (context) => Modular.get<AuthenticationBloc>()..add(AppStarted()),
+            ),
+          ],
         child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
           builder: (context, state) {
             if(state is AuthenticationAuthenticated){
@@ -30,7 +34,7 @@ class AuthenticateWidget extends StatelessWidget {
             return Center(child: Container(
                 height: 50,
                 width: 50,
-                child: CircularProgressIndicator()));
+                child: Image.asset('assets/images/loading.png')));
           },
         ),
       ),

@@ -15,7 +15,7 @@ class UtilButton extends StatelessWidget {
       child: InkWell(
         onTap: callback,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 15.0,vertical: 4.0),
           decoration: BoxDecoration(
               color: kGreyColor.withOpacity(0.3),
               borderRadius: BorderRadius.circular(5.0),

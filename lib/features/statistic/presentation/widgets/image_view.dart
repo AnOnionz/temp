@@ -16,6 +16,7 @@ class ImageView extends StatefulWidget {
 class _ImageViewState extends State<ImageView> {
   late int _imgSelected = 0;
   late int _rotate = 0;
+  final GlobalKey<ExtendedImageEditorState> editorKey =GlobalKey<ExtendedImageEditorState>();
 
   late List<ImageItem> imageItems =
       widget.images.map((e) => ImageItem(url: e, rotate: 0)).toList();
@@ -53,6 +54,7 @@ class _ImageViewState extends State<ImageView> {
                 quarterTurns: imageItems[_imgSelected].rotate,
                 child: ExtendedImage.network(
                   path,
+
                   cache: true,
                   imageCacheName: '$path',
                   initGestureConfigHandler: (state) {
@@ -61,7 +63,8 @@ class _ImageViewState extends State<ImageView> {
                     );
                   },
                   fit: BoxFit.contain,
-                  mode: ExtendedImageMode.gesture,
+                  mode: ExtendedImageMode.editor,
+                  extendedImageEditorKey: editorKey,
                   enableMemoryCache: true,
                   enableLoadState: true,
                 ),
@@ -97,10 +100,7 @@ class _ImageViewState extends State<ImageView> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 UtilButton(
-                  icon: Image.asset(
-                    'assets/images/back_img.png',
-                    height: 22.5,
-                  ),
+                  icon: Icon(Icons.arrow_back_ios_outlined, size: 25,),
                   callback: () {
                     setState(() {
                       setState(() {
@@ -112,34 +112,25 @@ class _ImageViewState extends State<ImageView> {
                   },
                 ),
                 UtilButton(
-                  icon: Image.asset(
-                    'assets/images/left_rotate.png',
-                    height: 22.5,
-                  ),
+                  icon: Icon(Icons.rotate_left_outlined, size: 25,),
                   callback: () {
                     setState(() {
-                      _rotate--;
+                      editorKey.currentState!.rotate(right: false);
                       imageItems[_imgSelected].rotate = _rotate;
                     });
                   },
                 ),
                 UtilButton(
-                  icon: Image.asset(
-                    'assets/images/right_rotate.png',
-                    height: 22.5,
-                  ),
+                  icon: Icon(Icons.rotate_right_outlined,size: 25,),
                   callback: () {
                     setState(() {
-                      _rotate++;
+                     editorKey.currentState!.rotate(right: true);
                       imageItems[_imgSelected].rotate = _rotate;
                     });
                   },
                 ),
                 UtilButton(
-                  icon: Image.asset(
-                    'assets/images/next_img.png',
-                    height: 22.5,
-                  ),
+                  icon: Icon(Icons.arrow_forward_ios_outlined, size: 25,),
                   callback: () {
                     setState(() {
                       _imgSelected = _imgSelected < imageItems.length - 1

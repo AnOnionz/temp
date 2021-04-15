@@ -16,7 +16,7 @@ class _PaginationState extends State<Pagination> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 35.0, right: 55),
+      padding: const EdgeInsets.only(right: 55, bottom: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children:  widget.total > 6 ? widget.total - currentIndex > 5 ? [...[

@@ -21,7 +21,9 @@ class NavBar extends StatelessWidget {
       child: Row(
         children: [
           InkWell(
-            onTap: (){},
+            onTap: (){
+              Modular.to.navigate('/');
+            },
             child: Padding(
               padding: const EdgeInsets.only(top: 15.0, bottom: 15.0, left: 30.0, right: 75.0),
               child: Image.asset('assets/images/logo_nav.png', height: 34,),
