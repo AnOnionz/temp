@@ -70,7 +70,6 @@ class StatisticRepositoryImpl implements StatisticRepository{
   Future<Either<Failure, BillDetailEntity>> fetchBillDetail({required String token}) async{
     try {
       final detail = await remoteDataSource.fetchBillDetail(token: token);
-      return Left(InternetFailure());
       return Right(detail);
     } on InternetException catch(_){
       return Left(InternetFailure());

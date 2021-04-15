@@ -20,8 +20,8 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  TextEditingController ctlUserName = TextEditingController(text: 'userbaocao') ;
-  TextEditingController ctlPassword =  TextEditingController(text: '123456');
+  TextEditingController ctlUserName = TextEditingController();
+  TextEditingController ctlPassword =  TextEditingController();
   bool _obscureText = true;
 
   void _toggle() {
