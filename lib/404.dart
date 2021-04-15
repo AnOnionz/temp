@@ -20,7 +20,7 @@ class ErrorPage extends StatelessWidget {
                   is404 ? Image.asset(
                     'assets/images/404.png',
                     width: 800,
-                  ) : Image.asset('assert/images/desktop.png'),
+                  ) : Image.asset('assets/images/desktop.png', width: 800,),
                   is404 ? ElevatedButton(
                       onPressed: () {
                         html.window.location.reload();
