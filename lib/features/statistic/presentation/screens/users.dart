@@ -219,6 +219,30 @@ class _UsersState extends State<Users> {
                         ),
                         );
                       }
+                      if(state is UserBillLoadFail){
+                        return JDataTable(
+                            label: 'Tổng số phiếu đã nhập liệu: ',
+                            value: 0,
+                            labelStyle: kBlackBigText,
+                            valueStyle: kRedBigText,
+                            maxHeight: size.height - 415, headerData: _header, body:
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 30),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text('Không có dữ liệu', style: kGreySmallText,),
+                                const SizedBox(height: 10,),
+                                ElevatedButton(onPressed: (){
+                                  userBillCubit.reloadUserBill();
+                                }, child: Text('tải lại')),
+                              ],
+                            ),
+                          )
+                        )
+                        );
+                      }
                       return JDataTable(
                         label: 'Tổng số phiếu đã nhập liệu: ',
                         value: 0,

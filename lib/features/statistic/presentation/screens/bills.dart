@@ -346,6 +346,29 @@ class _BillsState extends State<Bills> {
                             ),
                           );
                         }
+                        if(state is BillLoadFailure){
+                          return JDataTable(
+                            // label: 'Kết quả: ',
+                            // value: 0,
+                            // labelStyle: kRedText,
+                            // valueStyle: kRedText,
+                              maxHeight: size.height * 0.6,
+                              headerData: _header,
+                              body: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 30),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text('Không có dữ liệu', style: kGreySmallText,),
+                                    const SizedBox(height: 10,),
+                                    ElevatedButton(onPressed: (){
+                                      billCubit.reloadBill();
+                                    }, child: Text('tải lại')),
+                                  ],
+                                ),
+                              )
+                          );
+                        }
                         return JDataTable(
                           // label: 'Kết quả: ',
                           // value: 0,

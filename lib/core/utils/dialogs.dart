@@ -4,6 +4,7 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:sp_bill/core/common/constants.dart';
 import 'package:sp_bill/core/error/failure.dart';
 import 'package:sp_bill/features/login/presentation/blocs/authentication_bloc.dart';
+import 'package:sp_bill/features/login/presentation/blocs/login_bloc.dart';
 
 void displayError(Failure failure){
   if(failure is ResponseFailure){
@@ -31,7 +32,7 @@ void displayError(Failure failure){
       builder: (context) {
         Future.delayed(Duration(milliseconds: 1500), (){
           Navigator.pop(context);
-          Modular.get<AuthenticationBloc>().add(LoggedOut());
+          Modular.get<LoginBloc>().add(LogoutButtonPress());
         });
         return AlertDialog(
           title: Text('Thông báo'),

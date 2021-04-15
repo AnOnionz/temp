@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
+import 'package:sp_bill/core/utils/dialogs.dart';
 import 'package:sp_bill/features/statistic/domain/entities/bill_response.dart';
 import 'package:sp_bill/features/statistic/domain/usecases/fetch_all_bill_usecase.dart';
 
@@ -14,11 +15,22 @@ class BillCubit extends Cubit<BillState> {
   void fetchBill({int? begin, int? end, int? status, int? billId, String? outletCode, required int userId}) async {
     final bills = await fetchAllBill(BillParams(userId: userId, begin: begin, end: end, outletCode: outletCode, billId: billId, status: status));
     filter = BillParams(userId: userId, begin: begin, end: end, outletCode: outletCode, billId: billId, status: status);
-    emit(bills.fold((l) => BillLoadFailure(), (r) => BillLoaded(response: r)));
+    emit(bills.fold((l) {
+      displayError(l);
+      return BillLoadFailure();}, (r) => BillLoaded(response: r)));
   }
   void fetchIndexPage({required int page}) async {
     emit(BillLoadLoading());
     final bills = await fetchAllBill(BillParams(page: page, userId: filter.userId, billId: filter.billId, outletCode: filter.outletCode, begin: filter.begin, end: filter.end, status: filter.status));
-    emit(bills.fold((l) => BillLoadFailure(), (r) => BillLoaded(response: r)));
+    emit(bills.fold((l){
+      displayError(l);
+      return BillLoadFailure();}, (r) => BillLoaded(response: r)));
+  }
+  void reloadBill() async {
+    emit(BillLoadLoading());
+    final bills = await fetchAllBill(filter);
+    emit(bills.fold((l){
+      displayError(l);
+      return BillLoadFailure();}, (r) => BillLoaded(response: r)));
   }
 }

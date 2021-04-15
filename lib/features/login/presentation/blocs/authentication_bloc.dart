@@ -24,7 +24,6 @@ class AuthenticationBloc
       try {
           await localStorage.ready;
           String? user = localStorage.getItem(USER);
-          print(user);
           if (user != null) {
           print('User:' + user);
           Future.delayed(Duration.zero);
@@ -45,7 +44,6 @@ class AuthenticationBloc
       Future.delayed(Duration.zero);
       yield AuthenticationAuthenticated(user: event.loginEntity);
     }
-
     if (event is LoggedOut) {
       localStorage.deleteItem(USER);
       yield AuthenticationUnauthenticated();

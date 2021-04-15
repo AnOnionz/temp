@@ -15,11 +15,8 @@ class ImageView extends StatefulWidget {
 
 class _ImageViewState extends State<ImageView> {
   late int _imgSelected = 0;
-  late int _rotate = 0;
   final GlobalKey<ExtendedImageEditorState> editorKey =GlobalKey<ExtendedImageEditorState>();
 
-  late List<ImageItem> imageItems =
-      widget.images.map((e) => ImageItem(url: e, rotate: 0)).toList();
   @override
   void dispose() {
     clearMemoryImageCache();
@@ -48,27 +45,23 @@ class _ImageViewState extends State<ImageView> {
             canMovePage: (gestureDetails) => false,
             itemBuilder: (BuildContext context, int index) {
               index = _imgSelected;
-              var path = imageItems[index].url;
+              var path = widget.images[index];
               Widget image = RepaintBoundary(
-                  child: RotatedBox(
-                quarterTurns: imageItems[_imgSelected].rotate,
-                child: ExtendedImage.network(
-                  path,
-
-                  cache: true,
-                  imageCacheName: '$path',
-                  initGestureConfigHandler: (state) {
-                    return GestureConfig(
-                      cacheGesture: true,
-                    );
-                  },
-                  fit: BoxFit.contain,
-                  mode: ExtendedImageMode.editor,
-                  extendedImageEditorKey: editorKey,
-                  enableMemoryCache: true,
-                  enableLoadState: true,
-                ),
-              ));
+                  child: ExtendedImage.network(
+                    path,
+                    cache: true,
+                    imageCacheName: '$path',
+                    initGestureConfigHandler: (state) {
+                      return GestureConfig(
+                        cacheGesture: true,
+                      );
+                    },
+                    fit: BoxFit.contain,
+                    mode: ExtendedImageMode.editor,
+                    extendedImageEditorKey: editorKey,
+                    enableMemoryCache: true,
+                    enableLoadState: true,
+                  ));
               image = Container(
                 child: image,
                 padding: EdgeInsets.all(5.0),
@@ -77,7 +70,7 @@ class _ImageViewState extends State<ImageView> {
                 tag: path,
                   child: image);
             },
-            itemCount: imageItems.length,
+            itemCount: widget.images.length,
             controller: PageController(
               initialPage: _imgSelected,
               keepPage: true,
@@ -90,7 +83,7 @@ class _ImageViewState extends State<ImageView> {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                '${_imgSelected + 1}/${imageItems.length}',
+                '${_imgSelected + 1}/${widget.images.length}',
                 style: kBlackBigText,
               ),
             )),
@@ -106,7 +99,6 @@ class _ImageViewState extends State<ImageView> {
                       setState(() {
                         _imgSelected =
                             _imgSelected > 0 ? _imgSelected - 1 : _imgSelected;
-                        _rotate = 0;
                       });
                     });
                   },
@@ -116,7 +108,6 @@ class _ImageViewState extends State<ImageView> {
                   callback: () {
                     setState(() {
                       editorKey.currentState!.rotate(right: false);
-                      imageItems[_imgSelected].rotate = _rotate;
                     });
                   },
                 ),
@@ -125,7 +116,6 @@ class _ImageViewState extends State<ImageView> {
                   callback: () {
                     setState(() {
                      editorKey.currentState!.rotate(right: true);
-                      imageItems[_imgSelected].rotate = _rotate;
                     });
                   },
                 ),
@@ -133,10 +123,10 @@ class _ImageViewState extends State<ImageView> {
                   icon: Icon(Icons.arrow_forward_ios_outlined, size: 25,),
                   callback: () {
                     setState(() {
-                      _imgSelected = _imgSelected < imageItems.length - 1
+                      _imgSelected = _imgSelected < widget.images.length - 1
                           ? _imgSelected + 1
                           : _imgSelected;
-                      _rotate = 0;
+
                     });
                   },
                 ),
@@ -147,9 +137,3 @@ class _ImageViewState extends State<ImageView> {
   }
 }
 
-class ImageItem {
-  final String url;
-  int rotate;
-
-  ImageItem({required this.url, required this.rotate});
-}

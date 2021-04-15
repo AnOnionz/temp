@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:sp_bill/core/api/myDio.dart';
@@ -19,6 +19,7 @@ import 'package:sp_bill/features/statistic/presentation/bloc/bill_cubit.dart';
 import 'package:sp_bill/features/statistic/presentation/bloc/bill_detail_cubit.dart';
 import 'package:sp_bill/features/statistic/presentation/bloc/userbill_cubit.dart';
 import 'package:sp_bill/features/statistic/presentation/bloc/users_cubit.dart';
+import '../404.dart';
 import 'home_module.dart';
 
 class AppModule extends Module {
@@ -51,9 +52,8 @@ class AppModule extends Module {
   @override
   final List<ModularRoute> routes = [
     ModuleRoute('/', module: HomeModule(), transition: TransitionType.size, duration: Duration(seconds: 2)),
-    WildcardRoute(child: (_, args) => Container(
-      child: Center(child: Text('404')),
-    ),),
+    WildcardRoute(child: (_, args) => ErrorPage(is404: true,),
+      ),
   ];
 
 }

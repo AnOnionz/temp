@@ -141,6 +141,12 @@ class _EditState extends State<Edit> {
                   ),
                 );
               }
+              if(state is BillDetailFailure){
+                return Expanded(child: Center(child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 30),
+                  child: Text('Đã xảy ra lối', style: kGreySmallText,),
+                ),));
+              }
               return Expanded(child: Center(child: Container(height: 60, width: 60, child: CircularProgressIndicator(),),));
             },
           ),

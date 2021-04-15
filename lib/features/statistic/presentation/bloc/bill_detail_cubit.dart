@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:sp_bill/core/utils/dialogs.dart';
 import 'package:sp_bill/features/statistic/domain/entities/bill_detail.dart';
 import 'package:sp_bill/features/statistic/domain/usecases/fetch_bill_detail_usecase.dart';
 
@@ -13,6 +14,8 @@ class BillDetailCubit extends Cubit<BillDetailState> {
 
   void fetchDetail({required String token}) async {
     final detail = await fetchBillDetail(BillDetailParams(token: token));
-    emit(detail.fold((l) => BillDetailFailure(), (r) => BillDetailLoaded(detail: r)));
+    emit(detail.fold((l) {
+      displayError(l);
+      return BillDetailFailure();}, (r) => BillDetailLoaded(detail: r)));
   }
 }

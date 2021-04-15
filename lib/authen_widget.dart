@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:sp_bill/responsive.dart';
+import '404.dart';
 import 'core/api/myDio.dart';
 import 'features/login/presentation/blocs/authentication_bloc.dart';
 import 'features/login/presentation/screens/login_page.dart';
@@ -14,8 +15,8 @@ class AuthenticateWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Responsive(
-        mobile: Container(),
-        tablet: Container(),
+        mobile: ErrorPage(),
+        tablet: ErrorPage(),
         desktop: MultiBlocProvider(
           providers: [
             BlocProvider<AuthenticationBloc>(
