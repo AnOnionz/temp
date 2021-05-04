@@ -8,7 +8,7 @@ import '../../../../core/widgets/single_filed.dart';
 class SingleForm extends StatelessWidget {
   final IndustryEntity industry;
 
-  SingleForm({Key? key, required this.industry}) : super(key: key);
+  SingleForm({Key key, @required this.industry}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -52,8 +52,8 @@ class SingleForm extends StatelessWidget {
                 //   ),),
                 SingleField(label: 'Số lượng', width: size.width / 12 - 20, small: true,disable: true,initValue: industry.qty==null?'':industry.qty.toString()),
                 SingleField(label: 'Đơn vị tính', width: size.width / 12 - 20, small: true,disable: true,initValue: industry.unit??'',),
-                SingleField(label: 'Đơn giá', width: size.width / 12 - 20, small: true,disable:true,initValue: industry.unitPrince==null ? "" : industry.unitPrince.toString() ,),
-                SingleField(label: 'Tổng tiền', width: size.width / 12 - 20, small: true, disable: true, initValue: industry.unitPrince==null || industry.qty==null ? "" : displayPrice(industry.unitPrince! * industry.qty!,)),
+                SingleField(label: 'Đơn giá', width: size.width / 12 - 20, small: true,disable:true,initValue: industry.unitPrince==null ? '' : displayPrice(industry.unitPrince),),
+                SingleField(label: 'Tổng tiền', width: size.width / 12 - 20, small: true, disable: true, initValue: industry.unitPrince==null || industry.qty==null ? '' : displayPrice(industry.unitPrince * industry.qty,)),
               ],
             ),
             const SizedBox(height: 19.0,),

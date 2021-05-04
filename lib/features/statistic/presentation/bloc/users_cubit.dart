@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:sp_bill/core/usecases/usecase.dart';
 import 'package:sp_bill/core/utils/dialogs.dart';
 import 'package:sp_bill/features/statistic/data/model/user_model.dart';
@@ -10,7 +11,7 @@ part 'users_state.dart';
 
 class UsersCubit extends Cubit<FetchUsersState> {
   final FetchAllUserUseCase fetchAllUser;
-  UsersCubit({required this.fetchAllUser}) : super(FetchUsersInitial());
+  UsersCubit({@required this.fetchAllUser}) : super(FetchUsersInitial());
 
   void fetchUsers() async {
     final users = await fetchAllUser(NoParams());

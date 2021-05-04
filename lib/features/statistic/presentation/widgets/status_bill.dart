@@ -26,7 +26,7 @@ class StatusBill extends StatelessWidget {
     }
     return Colors.black87;
   }
-  const StatusBill({Key? key, required this.status}) : super(key: key);
+  const StatusBill({Key key, @required this.status}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Row(

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,6 +14,7 @@ import 'package:sp_bill/features/statistic/domain/entities/bill.dart';
 import 'package:sp_bill/features/statistic/presentation/bloc/bill_cubit.dart';
 import 'package:sp_bill/features/statistic/presentation/bloc/users_cubit.dart';
 import 'package:sp_bill/features/statistic/presentation/widgets/status_bill.dart';
+import 'package:sp_bill/features/statistic/presentation/widgets/total_excel_button.dart';
 import '../../../../core/common/constants.dart';
 import '../../../../core/widgets/data_table.dart';
 import '../../../../core/widgets/nav.dart';
@@ -25,7 +24,7 @@ import '../../../../responsive.dart';
 class Bills extends StatefulWidget {
   final String id;
 
-  Bills({Key? key, required this.id}) : super(key: key);
+  Bills({Key key, @required this.id}) : super(key: key);
 
   @override
   _BillsState createState() => _BillsState();
@@ -36,10 +35,14 @@ class _BillsState extends State<Bills> {
   TextEditingController _dateController = TextEditingController();
   TextEditingController _billIDController = TextEditingController();
   TextEditingController _outletCodeController = TextEditingController();
-  DateTimeRange? _selectedDate;
+  DateTimeRange _selectedDate;
+  String _selectedStatus;
   final BillCubit billCubit = Modular.get<BillCubit>();
-  late List<BillEntity> data = [];
-  String? _selectedStatus;
+
+  List<Map<String, dynamic>> exData = [];
+  List<BillEntity> data = [];
+  int currentIndex;
+
 
   final _header = {
     '#': 25,
@@ -67,7 +70,6 @@ class _BillsState extends State<Bills> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-
     return Responsive(
       mobile: Container(),
       tablet: Container(),
@@ -81,323 +83,342 @@ class _BillsState extends State<Bills> {
             child: Padding(
               padding:
                   const EdgeInsets.only(top: 38.0, right: 38.0, left: 38.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Stack(
                 children: [
-                  TabTitle(text: 'danh sách phiếu mua'.toUpperCase()),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 30),
-                    child: FractionallySizedBox(
-                      widthFactor: 6 / 8 + .03,
-                      child: Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.end,
-                        children: [
-                          SingleField(
-                            label: 'ID phiếu',
-                            width: size.width / 8,
-                            controller: _billIDController,
-                            inputFormatter: <TextInputFormatter>[
-                              LengthLimitingTextInputFormatter(
-                                  15),
-                              FilteringTextInputFormatter
-                                  .digitsOnly,
-                              FilteringTextInputFormatter
-                                  .allow(RegExp(r'[0-9]'))
-                            ],
+                  const TotalExcelButton(),
+                  // BlocBuilder<BillCubit, BillState>(
+                  //     bloc: billCubit,
+                  //     builder: (context, state) {
+                  //       if (state is BillLoaded) {
+                  //         exData = state.response.bills.map((e) => e.toJson()).toList();
+                  //         return Align(
+                  //           alignment: Alignment.topRight,
+                  //           child: exData.isNotEmpty ? ElevatedButton(
+                  //             style: ElevatedButton.styleFrom(
+                  //                 padding: const EdgeInsets.symmetric(
+                  //                     horizontal: 20, vertical: 16) //
+                  //             ),
+                  //             onPressed: () {
+                  //               exportExcel(data: exData, name: 'bill');
+                  //             },
+                  //             child: Text('xuất excel'),
+                  //           ) : const SizedBox(),
+                  //         );
+                  //       }
+                  //       return const SizedBox();
+                  //     }
+                  // ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TabTitle(text: 'danh sách phiếu mua'.toUpperCase()),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 30),
+                        child: FractionallySizedBox(
+                          widthFactor: 6 / 8 + .03,
+                          child: Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.end,
+                            children: [
+                              SingleField(
+                                label: 'ID phiếu',
+                                width: size.width / 8,
+                                controller: _billIDController,
+                                inputFormatter: <TextInputFormatter>[
+                                  LengthLimitingTextInputFormatter(
+                                      15),
+                                  FilteringTextInputFormatter
+                                      .digitsOnly,
+                                  FilteringTextInputFormatter
+                                      .allow(RegExp(r'[0-9]'))
+                                ],
 
-                          ),
-                          SingleField(
-                            label: 'Outlet code',
-                            width: size.width / 8,
-                            controller: _outletCodeController,
-                            inputFormatter: <TextInputFormatter>[
-                              LengthLimitingTextInputFormatter(
-                                  15),
-                              FilteringTextInputFormatter
-                                  .digitsOnly,
-                              FilteringTextInputFormatter
-                                  .allow(RegExp(r'[0-9]'))
+                              ),
+                              SingleField(
+                                label: 'Outlet code',
+                                width: size.width / 8,
+                                controller: _outletCodeController,
+                                inputFormatter: <TextInputFormatter>[
+                                  LengthLimitingTextInputFormatter(
+                                      15),
+                                  FilteringTextInputFormatter
+                                      .digitsOnly,
+                                  FilteringTextInputFormatter
+                                      .allow(RegExp(r'[0-9]'))
+                                ],
+                              ),
+                              DropdownField(
+                                label: 'User nhập liệu',
+                                width: size.width / 8,
+                                disable: true,
+                                child: BlocBuilder<UsersCubit, FetchUsersState>(
+                                  bloc: Modular.get<UsersCubit>()..fetchUsers(),
+                                  builder: (context, state) {
+                                    if (state is FetchUsersLoaded) {
+                                      return DropdownButtonHideUnderline(
+                                        child: DropdownButton<String>(
+                                          icon: Icon(Icons.keyboard_arrow_down),
+                                          value: state.users.firstWhere((element) => element.id == int.parse(widget.id)).userName,
+                                          style: kBlackSmallText,
+                                          isDense: true,
+                                          items: [
+                                            DropdownMenuItem<String>(
+                                              value: state.users.firstWhere((element) => element.id == int.parse(widget.id)).userName,
+                                              child: Text(state.users.firstWhere((element) => element.id == int.parse(widget.id)).userName),
+                                            )
+                                          ],
+                                        ),
+                                      );
+                                    }
+                                    return DropdownButtonHideUnderline(
+                                      child: DropdownButton<String>(
+                                        icon: Icon(Icons.keyboard_arrow_down),
+                                        value: '',
+                                        style: kBlackSmallText,
+                                        isDense: true,
+                                        items: [
+                                          DropdownMenuItem<String>(
+                                            value: '',
+                                            child: Text(''),
+                                          )
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              DateTimeField(
+                                label: 'Ngày nhập liệu',
+                                width: size.width / 8,
+                                controller: _dateController,
+                                onTap: () async {
+                                  final rangeDate = await showDateRangePicker(
+                                    context: context,
+                                    firstDate: DateTime(1900),
+                                    lastDate: DateTime(2100),
+                                    useRootNavigator: true,
+                                    locale: Locale('vi', 'VN'),
+                                  );
+                                  if (rangeDate != null &&
+                                      rangeDate != _selectedDate) {
+                                    setState(() {
+                                      _selectedDate = rangeDate;
+                                    });
+                                    _dateController.text = DateFormat('dd/MM/yyyy')
+                                            .format(rangeDate.start)
+                                            .toString() +
+                                        ' - ' +
+                                        DateFormat('dd/MM/yyyy')
+                                            .format(rangeDate.end)
+                                            .toString();
+                                  }
+                                },
+                              ),
+                            DropdownField(label: 'Tình trạng' ,width: 230,
+                              child: DropdownButtonHideUnderline(
+                              child: DropdownButton<String>(
+                              icon: InkWell(
+                                onTap: (){
+                                  setState(() {
+                                    _selectedStatus = null;
+                                  });
+                                },
+                                  child:_selectedStatus!=null ? Icon(Icons.close, size: 20,) : Icon(Icons.keyboard_arrow_down)),
+                              isDense: true,
+                              value: _selectedStatus,
+                              onChanged: (String newValue) {
+                                setState(() {
+                                  if(newValue!=null) {
+                                    _selectedStatus = newValue;
+                                  }
+                                });
+                              },
+                              items:status.entries
+                                  .map((e) => DropdownMenuItem<String>(
+                                value: e.key,
+                                child: Text(e.value),
+                                onTap: () {
+                                  setState(() {
+                                    _selectedStatus = e.key;
+                                  });
+                                },
+                              ))
+                                  .toList(),
+                              ),
+                             ),
+                            ),
+
+                             ElevatedButton(
+                               onPressed: () {
+                                 billCubit.fetchBill(
+                                   userId: int.parse(widget.id),
+                                   outletCode: _outletCodeController.text.isEmpty? null :_outletCodeController.text ,
+                                   billId: _billIDController.text.isEmpty ? null :int.parse(_billIDController.text),
+                                   begin: _selectedDate != null ? _selectedDate.start.millisecondsSinceEpoch ~/1000 : null,
+                                   end: _selectedDate != null ? _selectedDate.end.millisecondsSinceEpoch ~/1000 : null,
+                                   status: _selectedStatus != null ? int.parse(_selectedStatus) : null,
+                                 );
+
+                               },
+                               child: Text(
+                                 'Tìm',
+                                 style: kWhiteSmallText,
+                               ),
+                               style: ElevatedButton.styleFrom(
+                                   elevation: 0,
+                                   padding: const EdgeInsets.symmetric(
+                                       horizontal: 40, vertical: 16) // foreground
+                                   ),
+                             )
                             ],
                           ),
-                          DropdownField(
-                            label: 'User nhập liệu',
-                            width: size.width / 8,
-                            disable: true,
-                            child: BlocBuilder<UsersCubit, FetchUsersState>(
-                              bloc: Modular.get<UsersCubit>()..fetchUsers(),
-                              builder: (context, state) {
-                                if (state is FetchUsersLoaded) {
-                                  return DropdownButtonHideUnderline(
-                                    child: DropdownButton<String>(
-                                      icon: Icon(Icons.keyboard_arrow_down),
-                                      value: state.users.firstWhere((element) => element.id == int.parse(widget.id)).userName,
-                                      style: kBlackSmallText,
-                                      isDense: true,
-                                      items: [
-                                        DropdownMenuItem<String>(
-                                          value: state.users.firstWhere((element) => element.id == int.parse(widget.id)).userName,
-                                          child: Text(state.users.firstWhere((element) => element.id == int.parse(widget.id)).userName),
-                                        )
+                        ),
+                      ),
+                      Expanded(
+                        child: BlocBuilder<BillCubit, BillState>(
+                          bloc: billCubit,
+                          builder: (context, state) {
+                            if (state is BillLoaded) {
+                              data = state.response.bills;
+                              return JDataTable(
+                                // label: 'Kết quả: ',
+                                // value: state.response.,
+                                // labelStyle: kRedText,
+                                // valueStyle: kRedText,
+                                maxHeight: size.height - 415,
+                                headerData: _header,
+                                body: data.isNotEmpty ? ListView.separated(
+                                  controller: _scrollController,
+                                  separatorBuilder: (context, index) => Divider(
+                                    color: kGreyColor,
+                                  ),
+                                  itemBuilder: (context, index) => Padding(
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 7.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Container(
+                                            width: size.width / 25,
+                                            child: Text('${index + 1}')),
+                                        Container(
+                                            width: size.width / 10,
+                                            child: Text(
+                                              data[index].id.toString(),
+                                              style: kBlackSmallText,
+                                            )),
+                                        Container(
+                                            width: size.width / 10,
+                                            child: Text(
+                                              data[index].outletCode,
+                                              style: kBlackSmallText,
+                                            )),
+                                        Container(
+                                            width: size.width / 7,
+                                            child: Text(
+                                              data[index].outletName,
+                                              style: kBlackSmallText,
+                                            )),
+                                        Container(
+                                            width: size.width / 10,
+                                            child: Text(
+                                              displayPrice(data[index].totalBill),
+                                              style: kBlackSmallText,
+                                            )),
+                                        Container(
+                                            width: size.width / 10,
+                                            child: Text(
+                                              data[index].userName,
+                                              style: kBlackSmallText,
+                                            )),
+                                        Container(
+                                            width: size.width / 10,
+                                            child: Text(
+                                              data[index].doneAt,
+                                              style: kBlackSmallText,
+                                            )),
+                                        Container(
+                                            width: size.width / 10,
+                                            child: StatusBill(
+                                                status: data[index].status)),
+                                        Container(
+                                            width: size.width / 25,
+                                            child: Center(
+                                              child: HoverButton(
+                                                onPressed: () {
+                                                  Modular.to.pushNamed(
+                                                      '/bill/${data[index].token}');
+                                                },
+                                                icon: Icon(Icons.remove_red_eye_sharp, color: Colors.black54,),
+                                                onActive: Icon(Icons.remove_red_eye_sharp, color: kGreenColor,),
+                                              ),
+                                            )),
                                       ],
                                     ),
-                                  );
-                                }
-                                return DropdownButtonHideUnderline(
-                                  child: DropdownButton<String>(
-                                    icon: Icon(Icons.keyboard_arrow_down),
-                                    value: '',
-                                    style: kBlackSmallText,
-                                    isDense: true,
-                                    items: [
-                                      DropdownMenuItem<String>(
-                                        value: '',
-                                        child: Text(''),
-                                      )
-                                    ],
                                   ),
-                                );
-                              },
-                            ),
-                          ),
-                          DateTimeField(
-                            label: 'Ngày nhập liệu',
-                            width: size.width / 8,
-                            controller: _dateController,
-                            onTap: () async {
-                              final rangeDate = await showDateRangePicker(
-                                context: context,
-                                firstDate: DateTime(1900),
-                                lastDate: DateTime(2100),
-                                useRootNavigator: true,
-                                locale: Locale('vi', 'VN'),
-                              );
-                              if (rangeDate != null &&
-                                  rangeDate != _selectedDate) {
-                                setState(() {
-                                  _selectedDate = rangeDate;
-                                });
-                                _dateController.text = DateFormat('dd/MM/yyyy')
-                                        .format(rangeDate.start)
-                                        .toString() +
-                                    ' - ' +
-                                    DateFormat('dd/MM/yyyy')
-                                        .format(rangeDate.end)
-                                        .toString();
-                              }
-                            },
-                          ),
-                        DropdownField(label: 'Tình trạng' ,width: 230,
-                          child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                          icon: InkWell(
-                            onTap: (){
-                              setState(() {
-                                _selectedStatus = null;
-                              });
-                            },
-                              child:_selectedStatus!=null ? Icon(Icons.close, size: 20,) : Icon(Icons.keyboard_arrow_down)),
-                          isDense: true,
-                          value: _selectedStatus,
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              if(newValue!=null) {
-                                _selectedStatus = newValue;
-                              }
-                            });
-                          },
-                          items:status.entries
-                              .map((e) => DropdownMenuItem<String>(
-                            value: e.key,
-                            child: Text(e.value),
-                            onTap: () {
-                              setState(() {
-                                _selectedStatus = e.key;
-                              });
-                            },
-                          ))
-                              .toList(),
-                          ),
-                         ),
-                        ),
-
-                         ElevatedButton(
-                           onPressed: () {
-                             billCubit.fetchBill(
-                               userId: int.parse(widget.id),
-                               outletCode: _outletCodeController.text.isEmpty? null :_outletCodeController.text ,
-                               billId: _billIDController.text.isEmpty ? null :int.parse(_billIDController.text),
-                               begin: _selectedDate != null ? _selectedDate!.start.millisecondsSinceEpoch ~/1000 : null,
-                               end: _selectedDate != null ? _selectedDate!.end.millisecondsSinceEpoch ~/1000 : null,
-                               status: _selectedStatus != null ? int.parse(_selectedStatus!) : null,
-                             );
-                           },
-                           child: Text(
-                             'Tìm',
-                             style: kBlackSmallText,
-                           ),
-                           style: ElevatedButton.styleFrom(
-                               primary: kGreyColor, // background
-                               onPrimary: kGreenColor,
-                               elevation: 0,
-                               padding: const EdgeInsets.symmetric(
-                                   horizontal: 40, vertical: 16) // foreground
-                               ),
-                         )
-                        ],
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: BlocBuilder<BillCubit, BillState>(
-                      bloc: billCubit,
-                      builder: (context, state) {
-                        if (state is BillLoaded) {
-                          data = state.response.bills;
-                          return JDataTable(
-                            // label: 'Kết quả: ',
-                            // value: state.response.,
-                            // labelStyle: kRedText,
-                            // valueStyle: kRedText,
-                            maxHeight: size.height - 415,
-                            headerData: _header,
-                            body: data.isNotEmpty ? ListView.separated(
-                              controller: _scrollController,
-                              separatorBuilder: (context, index) => Divider(
-                                color: kGreyColor,
-                              ),
-                              itemBuilder: (context, index) => Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 7.0),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Container(
-                                        width: size.width / 25,
-                                        child: Text('${index + 1}')),
-                                    Container(
-                                        width: size.width / 10,
-                                        child: Text(
-                                          data[index].id.toString(),
-                                          style: kBlackSmallText,
-                                        )),
-                                    Container(
-                                        width: size.width / 10,
-                                        child: Text(
-                                          data[index].outletCode,
-                                          style: kBlackSmallText,
-                                        )),
-                                    Container(
-                                        width: size.width / 7,
-                                        child: Text(
-                                          data[index].outletName,
-                                          style: kBlackSmallText,
-                                        )),
-                                    Container(
-                                        width: size.width / 10,
-                                        child: Text(
-                                          displayPrice(data[index].totalBill),
-                                          style: kBlackSmallText,
-                                        )),
-                                    Container(
-                                        width: size.width / 10,
-                                        child: Text(
-                                          data[index].userName,
-                                          style: kBlackSmallText,
-                                        )),
-                                    Container(
-                                        width: size.width / 10,
-                                        child: Text(
-                                          data[index].doneAt,
-                                          style: kBlackSmallText,
-                                        )),
-                                    Container(
-                                        width: size.width / 10,
-                                        child: StatusBill(
-                                            status: data[index].status)),
-                                    Container(
-                                        width: size.width / 25,
-                                        child: Center(
-                                          child: HoverButton(
-                                            onPressed: () {
-                                              Modular.to.pushNamed(
-                                                  '/bill/${data[index].token}');
-                                            },
-                                            icon: Image.asset(
-                                              'assets/images/edit.png',
-                                              height: 16,
-                                              width: 16,
-                                            ),
-                                            onActive: Image.asset(
-                                              'assets/images/edit_hover.png',
-                                              height: 16,
-                                              width: 16,
-                                            ),
-                                          ),
-                                        )),
-                                  ],
+                                  itemCount: data.length,
+                                  shrinkWrap: true,
+                                ): Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 30),
+                                  child: Center(child: Text('Danh sách trống', style: kGreySmallText,)),
                                 ),
-                              ),
-                              itemCount: data.length,
-                              shrinkWrap: true,
-                            ): Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 30),
-                              child: Text('Không có dữ liệu', style: kGreySmallText,),
-                            ),
-                          );
-                        }
-                        if(state is BillLoadFailure){
-                          return JDataTable(
-                            // label: 'Kết quả: ',
-                            // value: 0,
-                            // labelStyle: kRedText,
-                            // valueStyle: kRedText,
+                              );
+                            }
+                            if(state is BillLoadFailure){
+                              return JDataTable(
+                                // label: 'Kết quả: ',
+                                // value: 0,
+                                // labelStyle: kRedText,
+                                // valueStyle: kRedText,
+                                  maxHeight: size.height * 0.6,
+                                  headerData: _header,
+                                  body: Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 30),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text('Danh sách trống', style: kGreySmallText,),
+                                        const SizedBox(height: 10,),
+                                        ElevatedButton(onPressed: (){
+                                          billCubit.reloadBill();
+                                        }, child: Text('tải lại')),
+                                      ],
+                                    ),
+                                  )
+                              );
+                            }
+                            return JDataTable(
+                              // label: 'Kết quả: ',
+                              // value: 0,
+                              // labelStyle: kRedText,
+                              // valueStyle: kRedText,
                               maxHeight: size.height * 0.6,
                               headerData: _header,
-                              body: Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 30),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text('Không có dữ liệu', style: kGreySmallText,),
-                                    const SizedBox(height: 10,),
-                                    ElevatedButton(onPressed: (){
-                                      billCubit.reloadBill();
-                                    }, child: Text('tải lại')),
-                                  ],
-                                ),
-                              )
-                          );
-                        }
-                        return JDataTable(
-                          // label: 'Kết quả: ',
-                          // value: 0,
-                          // labelStyle: kRedText,
-                          // valueStyle: kRedText,
-                          maxHeight: size.height * 0.6,
-                          headerData: _header,
-                          body: Center(child: Container(height: 60, width: 60, child: CircularProgressIndicator(),),)
-                        );
-                      },
-                    ),
-                  ),
-                  BlocBuilder<BillCubit, BillState>(
-                    bloc: billCubit,
-                    builder: (context, state) {
-                      if(state is BillLoaded){
-                        return state.response.bills.isNotEmpty && state.response.bills.length >= 20 ? Pagination(total: state.response.totalPage, callback: (index) {
-                          billCubit.fetchIndexPage(page: index);
-                          setState(() {
-                            _scrollController.animateTo(
-                              _scrollController.position.minScrollExtent,
-                              curve: Curves.easeOut,
-                              duration: const Duration(milliseconds: 100),
+                              body: Center(child: Container(height: 60, width: 60, child: CircularProgressIndicator(),),)
                             );
-                          });
-                        },) : Container();
-                      }
-                      return Container();
-                    },
+                          },
+                        ),
+                      ),
+                      BlocBuilder<BillCubit, BillState>(
+                        bloc: billCubit,
+                        builder: (context, state) {
+                          if(state is BillLoaded){
+                            return state.response.bills.isNotEmpty && state.response.bills.length >= 20 ? Pagination(current: currentIndex, total: state.response.totalPage, callback: (index) {
+                              billCubit.fetchIndexPage(page: index);
+                              setState(() {
+                                currentIndex = index;
+                                _scrollController.animateTo(
+                                  _scrollController.position.minScrollExtent,
+                                  curve: Curves.easeOut,
+                                  duration: const Duration(milliseconds: 100),
+                                );
+                              });
+                            },) : Container();
+                          }
+                          return Container();
+                        },
+                      ),
+                    ],
                   ),
                 ],
               ),

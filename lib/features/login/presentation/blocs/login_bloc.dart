@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:sp_bill/core/common/keys.dart';
 import 'package:sp_bill/core/error/failure.dart';
+import 'package:sp_bill/core/utils/dialogs.dart';
 import 'package:sp_bill/features/login/domain/entities/login_entity.dart';
 import 'package:sp_bill/features/login/domain/usecases/usecase_login.dart';
 import 'package:sp_bill/features/login/domain/usecases/usecase_logout.dart';
@@ -20,9 +21,9 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final LogoutUseCase logout;
   final AuthenticationBloc authenticationBloc;
   LoginBloc({
-    required this.login,
-    required this.logout,
-    required this.authenticationBloc,
+    @required this.login,
+    @required this.logout,
+    @required this.authenticationBloc,
   })  : super(LoginInitial());
 
   @override
@@ -47,9 +48,7 @@ Stream<LoginState> _eitherLoginOrErrorState(
   Either<Failure, LoginEntity> either,
 ) async* {
   yield either.fold((failure) {
-    if (failure is InternalFailure) {
-     return LoginInternalServer(message: failure.message);
-    }
+    displayError(failure);
     return LoginFailure(message: failure.message);
   },
       (user) {

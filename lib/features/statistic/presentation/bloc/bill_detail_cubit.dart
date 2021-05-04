@@ -9,10 +9,10 @@ part 'bill_detail_state.dart';
 class BillDetailCubit extends Cubit<BillDetailState> {
   final FetchBillDetailUseCase fetchBillDetail;
   BillDetailCubit(
-  {required this.fetchBillDetail}
+  {@required this.fetchBillDetail}
       ) : super(BillDetailInitial());
 
-  void fetchDetail({required String token}) async {
+  void fetchDetail({@required String token}) async {
     final detail = await fetchBillDetail(BillDetailParams(token: token));
     emit(detail.fold((l) {
       displayError(l);

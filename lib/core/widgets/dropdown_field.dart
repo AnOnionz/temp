@@ -10,12 +10,12 @@ class DropdownField extends StatefulWidget {
   final Widget child;
 
   DropdownField(
-      {Key? key,
-      required this.label,
-      required this.width,
+      {Key key,
+      @required this.label,
+      @required this.width,
       this.small = false,
       this.disable = false,
-      required this.child})
+      @required this.child})
       : super(key: key);
 
   @override

@@ -4,7 +4,7 @@ import '../../core/common/constants.dart';
 class Header extends StatelessWidget {
   final Map<String, num> headerData ;
 
-  const Header({Key? key, required this.headerData}) : super(key: key);
+  const Header({Key key, @required this.headerData}) : super(key: key);
   @override
   Widget build(BuildContext context) {
 

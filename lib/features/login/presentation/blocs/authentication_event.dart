@@ -13,7 +13,7 @@ class AppStarted extends AuthenticationEvent {
 class LoggedIn extends AuthenticationEvent {
   final LoginEntity loginEntity;
 
-  LoggedIn({required this.loginEntity});
+  LoggedIn({@required this.loginEntity});
   @override
   List<Object> get props => [loginEntity];
 

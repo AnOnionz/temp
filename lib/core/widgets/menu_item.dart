@@ -8,7 +8,7 @@ class MenuItem extends StatelessWidget {
   final String route;
   final bool isActive;
 
-  MenuItem({Key? key, required this.title, required this.route, required this.isActive}) : super(key: key);
+  MenuItem({Key key, @required this.title, @required this.route, @required this.isActive}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

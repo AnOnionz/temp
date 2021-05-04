@@ -9,7 +9,7 @@ abstract class LoginState extends Equatable {
 class LoginInternalServer extends LoginState {
   final String message;
 
-  LoginInternalServer({required this.message});
+  LoginInternalServer({@required this.message});
 }
 
 class LoginNoInternet extends LoginState {}
@@ -21,13 +21,13 @@ class LoginLoading extends LoginState {}
 class LoginSuccess extends LoginState {
   final LoginEntity user;
 
-  LoginSuccess({required this.user});
+  LoginSuccess({@required this.user});
 }
 
 class LoginFailure extends LoginState {
   final String message;
 
-  LoginFailure({required this.message});
+  LoginFailure({@required this.message});
   @override
   List<Object> get props => [message];
 }
@@ -35,7 +35,7 @@ class LoginFailure extends LoginState {
 class LogoutFailure extends LoginState {
   final String message;
 
-  LogoutFailure({required this.message});
+  LogoutFailure({@required this.message});
   @override
   List<Object> get props => [message];
 }

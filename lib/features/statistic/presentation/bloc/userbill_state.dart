@@ -7,6 +7,6 @@ class UserBillInitial extends UserBillState {}
 class UserBillLoaded extends UserBillState {
   final UserBillResponse response;
 
-  UserBillLoaded({required this.response});
+  UserBillLoaded({@required this.response});
 }
 class UserBillLoadFail extends UserBillState{}

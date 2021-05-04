@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 class UnAuthenticateException implements Exception{
   final String message ;
 
@@ -11,15 +12,10 @@ class UnAuthenticateException implements Exception{
 class ResponseException implements Exception{
   final String message;
 
-  ResponseException({required this.message});
+  ResponseException({@required this.message});
 
 }
-class NTPException implements Exception{}
-class NoImageException implements Exception {}
-class LocalException implements Exception{}
+class PermissionException implements Exception{}
 class InternetException implements Exception{}
 class InternalException implements Exception{}
-class SetOver implements Exception{}
-class SetSBOver implements Exception{}
-class InventoryNullException implements Exception{}
-class HighlightNullException implements Exception{}
+

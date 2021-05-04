@@ -11,7 +11,7 @@ class FetchUsersInitial extends FetchUsersState {
 class FetchUsersLoaded extends FetchUsersState {
   final List<UserEntity> users;
 
-  FetchUsersLoaded({required this.users});
+  FetchUsersLoaded({@required this.users});
   @override
   List<Object> get props => [users];
 }

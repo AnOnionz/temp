@@ -12,7 +12,7 @@ import 'package:sp_bill/features/login/presentation/blocs/login_bloc.dart';
 
 class LoginPage extends StatefulWidget {
 
-  const LoginPage({Key? key,}) : super(key: key);
+  const LoginPage({Key key,}) : super(key: key);
 
 
   @override
@@ -118,6 +118,7 @@ class _LoginPageState extends State<LoginPage> {
                                 height: 37,
                                 width: size.width *.3 /1.8,
                                 child: TextFormField(
+
                                   controller: ctlPassword,
                                   obscuringCharacter: '*',
                                   obscureText: _obscureText,
@@ -184,7 +185,10 @@ class _LoginPageState extends State<LoginPage> {
                                     borderRadius: BorderRadius.circular(5.0),
 
                                   ),
-                                  child: Center(child: Container(height: 20, width:20, child: CircularProgressIndicator())),
+                                  child: Center(child: Container(height: 18, width:18, child: Theme(
+                                    data: Theme.of(context).copyWith(accentColor: Colors.white),
+                                    child: CircularProgressIndicator(strokeWidth: 2,),
+                                  ))),
                                 );
                               }
                               return InkWell(
@@ -197,7 +201,6 @@ class _LoginPageState extends State<LoginPage> {
                                   decoration: BoxDecoration(
                                     color: kGreenColor,
                                     borderRadius: BorderRadius.circular(5.0),
-
                                   ),
                                   child: Center(child: Text('Đăng nhập', style: kWhiteSmallText,)) ,
                                 ),

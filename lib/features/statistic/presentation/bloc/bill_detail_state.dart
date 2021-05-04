@@ -7,6 +7,6 @@ class BillDetailInitial extends BillDetailState {}
 class BillDetailLoaded extends BillDetailState {
   final BillDetailEntity detail;
 
-  BillDetailLoaded({required this.detail});
+  BillDetailLoaded({@required this.detail});
 }
 class BillDetailFailure extends BillDetailState {}

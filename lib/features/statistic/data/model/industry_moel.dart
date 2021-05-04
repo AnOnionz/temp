@@ -2,12 +2,12 @@ import 'package:sp_bill/features/statistic/domain/entities/industry.dart';
 
 class IndustryModel extends IndustryEntity {
   IndustryModel(
-      {int? industryId,
-      String? industryName,
-       String? productName,
-       int? qty,
-      String? unit,
-      int? unitPrince})
+      {int industryId,
+      String industryName,
+       String productName,
+       int qty,
+      String unit,
+      int unitPrince})
       : super(
             industryId: industryId,
             industryName: industryName,

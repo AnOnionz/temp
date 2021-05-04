@@ -8,7 +8,7 @@ class DateTimeField extends StatefulWidget {
   final VoidCallback onTap;
   final TextEditingController controller;
 
-  const DateTimeField({Key? key, required this.label, required this.width, required this.onTap, required this.controller})
+  const DateTimeField({Key key, @required this.label, @required this.width, @required this.onTap, @required this.controller})
       : super(key: key);
 
   @override

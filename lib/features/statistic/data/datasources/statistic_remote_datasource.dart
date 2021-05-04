@@ -1,36 +1,42 @@
+import 'package:flutter_modular/flutter_modular.dart';
 import 'package:sp_bill/core/api/myDio.dart';
-import 'package:sp_bill/features/login/presentation/blocs/authentication_bloc.dart';
+import 'package:sp_bill/core/error/Exception.dart';
 import 'package:sp_bill/features/statistic/data/model/bill_detail_model.dart';
 import 'package:sp_bill/features/statistic/data/model/bill_response_model.dart';
+import 'package:sp_bill/features/statistic/data/model/excel_model.dart';
 import 'package:sp_bill/features/statistic/data/model/user_bill_response_model.dart';
 import 'package:sp_bill/features/statistic/data/model/user_model.dart';
 import 'package:sp_bill/features/statistic/domain/entities/bill_detail.dart';
 import 'package:sp_bill/features/statistic/domain/entities/bill_response.dart';
+import 'package:sp_bill/features/statistic/domain/entities/excel.dart';
 import 'package:sp_bill/features/statistic/domain/entities/user.dart';
 import 'package:sp_bill/features/statistic/domain/entities/user_bill_response.dart';
+import 'package:flutter/foundation.dart';
 
 abstract class StatisticRemoteDataSource {
   Future<List<UserEntity>> fetchAllUser();
-  Future<UserBillResponse> fetchAllUserBill({int? begin,int? end, int? userId});
-  Future<BillResponse> fetchAllBill({int? begin, int? end, int? status, int? billId, String? outletCode, required int userId,int? page});
-  Future<BillDetailEntity> fetchBillDetail({required String token});
+  Future<UserBillResponse> fetchAllUserBill({int begin,int end, int userId});
+  Future<BillResponse> fetchAllBill({int begin, int end, int status, int billId, String outletCode, @required int userId,int page});
+  Future<BillDetailEntity> fetchBillDetail({@required String token});
+  Future<List<String>> fetchAllPart({int begin, int end, int status, int billId, String outletCode});
+  Future<List<ExcelEntity>> fetchAllReport({@required List<String> allPath});
 }
 
 class StatisticRemoteDataSourceImpl implements StatisticRemoteDataSource{
   final CDio cDio;
 
 
-  StatisticRemoteDataSourceImpl({required this.cDio});
+  StatisticRemoteDataSourceImpl({@required this.cDio});
 
   @override
   Future<List<UserEntity>> fetchAllUser() async  {
     Response _resp = await cDio.getResponse(path: 'home/users',);
-    print(_resp);
+
     return (_resp.data as List<dynamic>).map((e) => UserModel.fromJson(e)).toList();
   }
 
   @override
-  Future<UserBillResponse> fetchAllUserBill({int? begin,int? end, int? userId}) async {
+  Future<UserBillResponse> fetchAllUserBill({int begin,int end, int userId}) async {
     Map<String, dynamic> params
     = {
       'begin': begin,
@@ -38,12 +44,12 @@ class StatisticRemoteDataSourceImpl implements StatisticRemoteDataSource{
       'user': userId == 0 ? null : userId,
     };
     Response _resp = await cDio.getResponse(path: 'supervisor/statistic-user', data: params);
-    print(params);
+
     return UserBillResponseModel.fromJson(_resp.data);
   }
 
   @override
-  Future<BillResponse> fetchAllBill({int? begin, int? end, int? status, int? billId, String? outletCode, required int userId, int? page}) async {
+  Future<BillResponse> fetchAllBill({int begin, int end, int status, int billId, String outletCode, @required int userId, int page}) async {
     Map<String, dynamic> params
     = {
       'user_id': userId,
@@ -54,16 +60,68 @@ class StatisticRemoteDataSourceImpl implements StatisticRemoteDataSource{
       'status': status,
       'page': page
     };
-    print(params);
+
     Response _resp = await cDio.getResponse(path: 'supervisor/statistic-bill', data: params);
-    print(_resp);
+
     return BillResponseModel.fromJson(_resp.data);
   }
 
   @override
-  Future<BillDetailEntity> fetchBillDetail({required String token}) async{
+  Future<BillDetailEntity> fetchBillDetail({@required String token}) async{
     Response _resp = await cDio.getResponse(path: 'bill/detail?billToken=$token');
-    print('response: $_resp');
+
     return BillDetailModel.fromJson(_resp.data);
   }
+
+  @override
+  Future<List<String>> fetchAllPart({int begin, int end, int status, int billId, String outletCode}) async {
+    Map<String, dynamic> params
+    = {
+      'bill_id': billId,
+      'outlet_code' : outletCode,
+      'begin': begin,
+      'end': end,
+      'status': status,
+    };
+    Response _resp = await cDio.getResponse(path: 'supervisor/export', data: params);
+    return (_resp.data as List<dynamic>).map((e) => e.toString()).toList();
+  }
+
+  @override
+  Future<List<ExcelEntity>> fetchAllReport({List<String> allPath}) async {
+    final List<ExcelEntity> data = [];
+    try {
+      allPath.forEach((url) async {
+        Response _resp = await cDio.getResponse(
+            path: url.split('api/').last);
+        await Future.delayed(Duration(milliseconds: 100));
+        if (_resp.statusCode == 200) {
+          data.addAll(
+              (_resp.data as List<dynamic>).map((e) => ExcelModel.fromJson(e)));
+        }
+        if (_resp.statusCode == 401) {
+          throw(UnAuthenticateException());
+        }
+        if (_resp.statusCode == 500) {
+          throw(InternalException());
+        }
+        if (_resp.statusCode == 400 || _resp.data == {}) {
+          throw(ResponseException(
+              message: _resp.data['message'] ?? 'Sai cú pháp'));
+        }
+        throw(ResponseException(
+            message: "Đã có lỗi xảy ra (${_resp.statusCode}) "));
+      });
+    } on DioError catch (e) {
+        if (e.type == DioErrorType.connectTimeout ||
+        e.type == DioErrorType.receiveTimeout) {
+          throw(InternetException());
+        }
+          throw(ResponseException(message: "Đã xảy ra lỗi ngoài ý muốn, vui lòng chờ trong giây lát"));
+        }
+    return data;
+  }
 }
+// Future<Response> getReport(int index) async {
+//   return await Modular.get<CDio>().getResponse(path: 'supervisor/export-detail?page=$index');
+// }

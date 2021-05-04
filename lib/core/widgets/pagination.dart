@@ -4,15 +4,21 @@ import 'package:sp_bill/core/common/constants.dart';
 class Pagination extends StatefulWidget {
   final int total;
   final Function(int) callback;
+  final int current;
 
 
-  const Pagination({Key? key, required this.total,required this.callback}) : super(key: key);
+  const Pagination({Key key, @required this.total,@required this.callback, this.current}) : super(key: key);
   @override
   _PaginationState createState() => _PaginationState();
 }
 
 class _PaginationState extends State<Pagination> {
-  late int currentIndex = 1;
+  int currentIndex ;
+  @override
+  void initState() {
+    super.initState();
+    currentIndex = widget.current ?? 1;
+  }
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -86,7 +92,7 @@ class PaginationItem extends StatelessWidget{
   final int index;
   final VoidCallback onPressed;
 
-  const PaginationItem({Key? key, required this.currentIndex, required this.index, required this.onPressed}) : super(key: key);
+  const PaginationItem({Key key, @required this.currentIndex, @required this.index, @required this.onPressed}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Padding(

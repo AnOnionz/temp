@@ -1,15 +1,15 @@
 import 'package:sp_bill/features/statistic/domain/entities/bill.dart';
-
+import 'package:flutter/foundation.dart';
 class BillModel extends BillEntity {
   BillModel({
-    required int id,
-    required String outletName,
-    required String outletCode,
-    required String token,
-    required int totalBill,
-    required String userName,
-    required int status,
-    required String doneAt,
+    @required int id,
+    @required String outletName,
+    @required String outletCode,
+    @required String token,
+    @required int totalBill,
+    @required String userName,
+    @required int status,
+    @required String doneAt,
   }) : super(
           id: id,
           userName: userName,

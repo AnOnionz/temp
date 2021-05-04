@@ -6,7 +6,7 @@ class UtilButton extends StatelessWidget {
   final Widget icon;
   final VoidCallback callback;
 
-  const UtilButton({Key? key, required this.icon, required this.callback}) : super(key: key);
+  const UtilButton({Key key, @required this.icon, @required this.callback}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

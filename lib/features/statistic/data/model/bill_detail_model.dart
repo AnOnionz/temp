@@ -1,17 +1,18 @@
 import 'package:sp_bill/features/statistic/data/model/industry_moel.dart';
 import 'package:sp_bill/features/statistic/domain/entities/bill_detail.dart';
 import 'package:sp_bill/features/statistic/domain/entities/industry.dart';
+import 'package:flutter/foundation.dart';
 
 class BillDetailModel extends BillDetailEntity{
   BillDetailModel({
-    required int id,
-    required String billNumber,
-    required int totalBill,
-    required String outletCode,
-    required String outletName,
-    required String token,
-    required List<IndustryEntity> detail,
-    required List<String> imageUrls,
+    @required int id,
+    @required String billNumber,
+    @required int totalBill,
+    @required String outletCode,
+    @required String outletName,
+    @required String token,
+    @required List<IndustryEntity> detail,
+    @required List<String> imageUrls,
 }) : super(
     id: id,
     billNUmber: billNumber,

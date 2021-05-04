@@ -8,13 +8,13 @@ class SingleField  extends StatelessWidget {
   final double width;
   final bool small;
   final bool disable;
-  final dynamic? initValue;
-  late TextEditingController? controller;
-  final TextCapitalization? textCapitalization;
-  final TextInputType? inputType;
-  final List<TextInputFormatter>? inputFormatter;
+  final dynamic initValue;
+  TextEditingController controller;
+  final TextCapitalization textCapitalization;
+  final TextInputType inputType;
+  final List<TextInputFormatter> inputFormatter;
 
-  SingleField({Key? key, required this.label, required this.width, this.small = false, this.disable= false, this.controller, this.textCapitalization, this.inputType, this.inputFormatter, this.initValue}) : super(key: key);
+  SingleField({Key key, @required this.label, @required this.width, this.small = false, this.disable= false, this.controller, this.textCapitalization, this.inputType, this.inputFormatter, this.initValue}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +42,7 @@ class SingleField  extends StatelessWidget {
                   fillColor: Colors.white,
                   suffixIcon: disable ? Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Icon(Icons.block_outlined),
+                    child: Icon(Icons.block_outlined, size: 20,),
                   ) : null,
                   contentPadding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 10.0),
                   border: OutlineInputBorder(

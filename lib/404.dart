@@ -4,7 +4,7 @@ import 'dart:html' as html;
 class ErrorPage extends StatelessWidget {
   final bool is404;
 
-  const ErrorPage({Key? key, this.is404 = false}) : super(key: key);
+  const ErrorPage({Key key, this.is404 = false}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Center(

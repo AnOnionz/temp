@@ -2,7 +2,6 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:sp_bill/core/common/constants.dart';
 import 'package:sp_bill/features/statistic/domain/entities/industry.dart';
 import 'package:sp_bill/features/statistic/presentation/widgets/single_form.dart';
 
@@ -10,14 +9,20 @@ import 'package:sp_bill/features/statistic/presentation/widgets/single_form.dart
 class BillInputForm extends StatefulWidget {
   final List<IndustryEntity> data;
 
-  const BillInputForm({Key? key, required this.data}) : super(key: key);
+  const BillInputForm({Key key, @required this.data}) : super(key: key);
   @override
   _BillInputFormState createState() => _BillInputFormState();
 }
 
 class _BillInputFormState extends State<BillInputForm> {
   ScrollController _scrollController = ScrollController();
-  late final forms = widget.data.map((e) => SingleForm(industry: e)).toList();
+  List<SingleForm> forms ;
+
+   @override
+  void initState() {
+    forms = widget.data.map((e) => SingleForm(industry: e)).toList();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +30,7 @@ class _BillInputFormState extends State<BillInputForm> {
       children: [
         Container(
           constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height / 1.8),
+              maxHeight: MediaQuery.of(context).size.height - 300),
           child: ListView.builder(
             controller: _scrollController,
             itemBuilder: (context, index) {

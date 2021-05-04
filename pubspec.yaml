@@ -18,7 +18,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.12.0-0 <3.0.0"
+  sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -29,7 +29,9 @@ dependencies:
   asuka: ^2.0.0-nullsafety.2
 
   url_strategy: ^0.2.0
+
   localstorage: ^4.0.0+1
+
   flutter_modular: ^3.0.0-nullsafety.1
 
   flutter_bloc: ^7.0.0
@@ -38,21 +40,13 @@ dependencies:
 
   intl: ^0.17.0
 
-  carousel_slider: ^4.0.0-nullsafety.0
-
-  extended_image: ^4.0.1
-
-  syncfusion_flutter_datepicker: ^19.1.55-beta
-
   dio: ^4.0.0
 
   equatable: ^2.0.0
 
-  data_connection_checker: ^0.3.4
-
-  shared_preferences: ^2.0.5
-
   supercharged: ^2.0.0
+
+  essential_xlsx: ^1.1.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

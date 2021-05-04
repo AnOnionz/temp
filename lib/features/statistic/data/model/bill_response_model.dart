@@ -1,12 +1,12 @@
 import 'package:sp_bill/features/statistic/domain/entities/bill_response.dart';
-
+import 'package:flutter/foundation.dart';
 import 'bill_model.dart';
 
 class BillResponseModel extends BillResponse {
   BillResponseModel({
-    required int totalPage,
-    required int currentPage,
-    required List<BillModel> bills,
+    @required int totalPage,
+    @required int currentPage,
+    @required List<BillModel> bills,
   }) : super(bills: bills, totalPage: totalPage, currentPage: currentPage);
 
   factory BillResponseModel.fromJson(Map<String, dynamic> json) {

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:sp_bill/core/common/constants.dart';
 import 'package:sp_bill/core/error/failure.dart';
-import 'package:sp_bill/features/login/presentation/blocs/authentication_bloc.dart';
 import 'package:sp_bill/features/login/presentation/blocs/login_bloc.dart';
 
 void displayError(Failure failure){

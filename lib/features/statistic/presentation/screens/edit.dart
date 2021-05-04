@@ -12,16 +12,17 @@ import '../../../../responsive.dart';
 
 class Edit extends StatefulWidget {
   final String token;
+  static List<Map<String, dynamic>> exData;
 
-  const Edit({Key? key, required this.token}) : super(key: key);
+  const Edit({Key key, @required this.token}) : super(key: key);
 
   @override
   _EditState createState() => _EditState();
 }
 
 class _EditState extends State<Edit> {
-  late List<String> images = [];
-  late BillDetailCubit billDetailCubit = Modular.get<BillDetailCubit>();
+  List<String> images = [];
+  BillDetailCubit billDetailCubit = Modular.get<BillDetailCubit>();
 
   @override
   void initState() {
@@ -144,7 +145,7 @@ class _EditState extends State<Edit> {
               if(state is BillDetailFailure){
                 return Expanded(child: Center(child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 30),
-                  child: Text('Đã xảy ra lối', style: kGreySmallText,),
+                  child: Text('Đã xảy ra lỗi', style: kGreySmallText,),
                 ),));
               }
               return Expanded(child: Center(child: Container(height: 60, width: 60, child: CircularProgressIndicator(),),));

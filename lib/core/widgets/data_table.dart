@@ -6,17 +6,17 @@ class JDataTable extends StatelessWidget {
   final Map<String, num> headerData;
   final Widget body;
   final double maxHeight;
-  final String? label;
-  final int? value;
-  final TextStyle? labelStyle;
-  final TextStyle? valueStyle;
+  final String label;
+  final int value;
+  final TextStyle labelStyle;
+  final TextStyle valueStyle;
 
 
   const JDataTable(
-      {Key? key,
-      required this.headerData,
-      required this.body,
-      required this.maxHeight,
+      {Key key,
+      @required this.headerData,
+      @required this.body,
+      @required this.maxHeight,
        this.label,
         this.labelStyle,
         this.value,

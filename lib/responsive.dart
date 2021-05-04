@@ -1,12 +1,38 @@
+import 'package:essential_xlsx/essential_xlsx.dart';
 import 'package:flutter/material.dart';
 
+Future<void> exportExcel({@required List<Map<String, dynamic>> data, String name}) async {
+  if (data != null && data.isNotEmpty) {
+    if (data.isNotEmpty) {
+      var excel = SimpleXLSX();
+      excel.sheetName = 'sheet';
+      excel.fileName = name;
+      //add data
+      var idx = 0;
+      data.forEach((item) {
+        if (idx == 0) {
+          //add titles
+          excel.addRow(item.keys.toList());
+        }
+        {
+          //add values
+          excel.addRow(item.values.map((i) => i.toString()).toList());
+        }
+        idx++;
+      });
+
+      excel.build();
+    }
+  }
+}
+
 class Responsive extends StatelessWidget {
-  final Widget? mobile;
-  final Widget? tablet;
-  final Widget? desktop;
+  final Widget mobile;
+  final Widget tablet;
+  final Widget desktop;
 
   const Responsive({
-    Key? key,
+    Key key,
     @required this.mobile,
     @required this.tablet,
     @required this.desktop,
@@ -31,15 +57,15 @@ class Responsive extends StatelessWidget {
       // If our width is more than 1100 then we consider it a desktop
       builder: (context, constraints) {
         if (constraints.maxWidth >= 1280) {
-          return desktop!;
+          return desktop;
         }
         // If width it less then 1100 and more then 650 we consider it as tablet
         else if (constraints.maxWidth >= 650) {
-          return tablet!;
+          return tablet;
         }
         // Or less then that we called it mobile
         else {
-          return mobile!;
+          return mobile;
         }
       },
     );

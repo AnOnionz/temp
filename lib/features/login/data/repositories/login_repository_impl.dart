@@ -4,17 +4,18 @@ import 'package:sp_bill/core/error/failure.dart';
 import 'package:sp_bill/features/login/data/datasources/login_remote_datasource.dart';
 import 'package:sp_bill/features/login/domain/entities/login_entity.dart';
 import 'package:sp_bill/features/login/domain/repositories/login_repository.dart';
+import 'package:flutter/foundation.dart';
 
 class LoginRepositoryImpl implements LoginRepository{
   final LoginRemoteDataSource remoteDataSource;
 
-  LoginRepositoryImpl({required this.remoteDataSource,});
+  LoginRepositoryImpl({@required this.remoteDataSource,});
   @override
-  Future<Either<Failure, LoginEntity>> login({required String username, required String password}) async {
+  Future<Either<Failure, LoginEntity>> login({@required String username, @required String password}) async {
       try {
         final loginEntity = await remoteDataSource.login(
             username: username, password: password);
-        return Right(loginEntity);
+        return loginEntity.role == 2 ? Right(loginEntity) : Left(ResponseFailure(message: 'Tài khoản không có quyền truy cập'));
       } on InternetException catch(_){
         return Left(InternetFailure());
       } on UnAuthenticateException catch (_) {

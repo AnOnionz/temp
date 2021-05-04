@@ -9,9 +9,9 @@ part 'userbill_state.dart';
 class UserBillCubit extends Cubit<UserBillState> {
   static UserBillParam filter = UserBillParam(userId: 0);
   final FetchAllUserBillUseCase fetchAllUserBill;
-  UserBillCubit({required this.fetchAllUserBill}) : super(UserBillInitial());
+  UserBillCubit({@required this.fetchAllUserBill}) : super(UserBillInitial());
 
-  void fetchUserBill({int? begin,int? end, int? userId}) async {
+  void fetchUserBill({int begin,int end, int userId}) async {
     final userBills = await fetchAllUserBill(UserBillParam(begin: begin, end: end, userId: userId));
     filter = UserBillParam(begin: begin, end: end, userId: userId);
     emit(userBills.fold((l) {

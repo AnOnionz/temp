@@ -12,7 +12,7 @@ class NavBar extends StatelessWidget {
   final String userName;
   final int index;
 
-  const NavBar({Key? key, required this.userName, required this.index}) : super(key: key);
+  const NavBar({Key key, @required this.userName, @required this.index}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class NavBar extends StatelessWidget {
         children: [
           InkWell(
             onTap: (){
-              Modular.to.navigate('/');
+              Modular.to.pushNamed('/');
             },
             child: Padding(
               padding: const EdgeInsets.only(top: 15.0, bottom: 15.0, left: 30.0, right: 75.0),

@@ -71,6 +71,10 @@ const kRedBigText = TextStyle(
     color: kRedColor,
     fontSize: 20
 );
+const kTealText = TextStyle(
+    color: Colors.teal,
+    fontSize: 17
+);
 
 //bill status
 const int SUCCESS = 1;

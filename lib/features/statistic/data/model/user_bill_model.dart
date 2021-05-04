@@ -1,13 +1,14 @@
 import 'package:sp_bill/features/statistic/domain/entities/user_bill.dart';
+import 'package:flutter/foundation.dart';
 
 class UserBillModel extends UserBillEntity{
   UserBillModel({
-    required int userId,
-    required String userName,
-    required int done,
-    required int error,
-    required int imageError,
-    required String time
+    @required int userId,
+    @required String userName,
+    @required int done,
+    @required int error,
+    @required int imageError,
+    @required String time
 }): super(userId: userId, userName: userName,done: done, error: error, imageError: imageError, time: time);
 
   factory UserBillModel.fromJson(Map<String, dynamic> json){

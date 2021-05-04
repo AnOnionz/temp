@@ -8,13 +8,13 @@ class FormInfo extends StatelessWidget {
   final String outletCode;
   final int totalPrice;
 
-  const FormInfo({Key? key, required this.billId, required this.outletCode, required this.totalPrice}) : super(key: key);
+  const FormInfo({Key key, @required this.billId, @required this.outletCode, @required this.totalPrice}) : super(key: key);
 
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 74.0),
+      padding: const EdgeInsets.only(top: 74.0, bottom: 20),
       child: Row(
         children: [
           Image.asset('assets/images/play.png', height: 15.4,),

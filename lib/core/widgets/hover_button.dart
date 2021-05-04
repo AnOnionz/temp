@@ -5,14 +5,14 @@ class HoverButton extends StatefulWidget {
   final Widget onActive;
   final VoidCallback onPressed;
 
-  const HoverButton({Key? key,required this.icon,required this.onActive, required this.onPressed}) : super(key: key);
+  const HoverButton({Key key,@required this.icon,@required this.onActive, @required this.onPressed}) : super(key: key);
 
   @override
   _HoverButtonState createState() => _HoverButtonState();
 }
 
 class _HoverButtonState extends State<HoverButton> {
-  late bool _hover = false;
+   bool _hover = false;
 
   @override
   Widget build(BuildContext context) {

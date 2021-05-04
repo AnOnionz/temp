@@ -6,15 +6,15 @@ import 'package:localstorage/localstorage.dart';
 import 'package:sp_bill/core/common/keys.dart';
 import 'package:sp_bill/features/login/data/model/login_model.dart';
 import 'package:sp_bill/features/login/domain/entities/login_entity.dart';
-
+import 'package:flutter/foundation.dart';
 
 part 'authentication_event.dart';
 part 'authentication_state.dart';
 
 class AuthenticationBloc
     extends Bloc<AuthenticationEvent, AuthenticationState> {
-  AuthenticationBloc({required this.localStorage}) : super(AuthenticationInitial());
-
+  AuthenticationBloc({@required this.localStorage}) : super(AuthenticationInitial());
+  static bool isPopup = false;
   final LocalStorage  localStorage;
   @override
   Stream<AuthenticationState> mapEventToState(
@@ -23,9 +23,8 @@ class AuthenticationBloc
     if (event is AppStarted) {
       try {
           await localStorage.ready;
-          String? user = localStorage.getItem(USER);
+          String user = localStorage.getItem(USER);
           if (user != null) {
-          print('User:' + user);
           Future.delayed(Duration.zero);
           yield AuthenticationAuthenticated(user: LoginModel.fromJson(jsonDecode(user)));
         } else {
