@@ -1,6 +1,29 @@
 import 'package:essential_xlsx/essential_xlsx.dart';
 import 'package:flutter/material.dart';
 
+
+String _mappingTitle(String title){
+  switch(title){
+    case 'channel' : return '';
+    case 'bill_id' : return 'Bill ID';
+    case 'outlet_code' : return 'Outlet Code';
+    case 'outlet_name' : return 'Outlet Name';
+    case 'province' : return 'Province';
+    case 'industry_name': return 'Ngành Hàng';
+    case 'total_bill' : return 'TỔNG GIÁ TRỊ CỦA TOÀN BILL';
+    case 'product_name' : return 'Tên sản phẩm';
+    case 'qty': return 'Số lượng';
+    case 'unit' : return 'Đơn vị tính';
+    case 'unit_price' : return 'Đơn giá';
+    case 'total_money' : return 'Tổng tiền';
+    case 'note': return 'Ghi Chú';
+    case 'created_by' : return 'Nhân Viên Nhập';
+    case ' created_at' : return 'Ngày Nhập';
+    default: return title;
+  }
+
+
+}
 Future<void> exportExcel({@required List<Map<String, dynamic>> data, String name}) async {
   if (data != null && data.isNotEmpty) {
     if (data.isNotEmpty) {
@@ -12,7 +35,7 @@ Future<void> exportExcel({@required List<Map<String, dynamic>> data, String name
       data.forEach((item) {
         if (idx == 0) {
           //add titles
-          excel.addRow(item.keys.toList());
+          excel.addRow(item.keys.toList().map((e) => _mappingTitle(e)).toList());
         }
         {
           //add values

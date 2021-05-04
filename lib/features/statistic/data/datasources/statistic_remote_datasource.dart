@@ -90,35 +90,16 @@ class StatisticRemoteDataSourceImpl implements StatisticRemoteDataSource{
   @override
   Future<List<ExcelEntity>> fetchAllReport({List<String> allPath}) async {
     final List<ExcelEntity> data = [];
-    try {
-      allPath.forEach((url) async {
-        Response _resp = await cDio.getResponse(
-            path: url.split('api/').last);
-        await Future.delayed(Duration(milliseconds: 100));
-        if (_resp.statusCode == 200) {
-          data.addAll(
-              (_resp.data as List<dynamic>).map((e) => ExcelModel.fromJson(e)));
-        }
-        if (_resp.statusCode == 401) {
-          throw(UnAuthenticateException());
-        }
-        if (_resp.statusCode == 500) {
-          throw(InternalException());
-        }
-        if (_resp.statusCode == 400 || _resp.data == {}) {
-          throw(ResponseException(
-              message: _resp.data['message'] ?? 'Sai cú pháp'));
-        }
-        throw(ResponseException(
-            message: "Đã có lỗi xảy ra (${_resp.statusCode}) "));
-      });
-    } on DioError catch (e) {
-        if (e.type == DioErrorType.connectTimeout ||
-        e.type == DioErrorType.receiveTimeout) {
-          throw(InternetException());
-        }
-          throw(ResponseException(message: "Đã xảy ra lỗi ngoài ý muốn, vui lòng chờ trong giây lát"));
-        }
+
+    await Future.forEach(allPath.sublist(0,2), (url) async {
+      Response _resp = await cDio.getResponse(
+          path: url
+              .split('api/')
+              .last);
+      data.addAll(
+          (_resp.data as List<dynamic>).map((e) => ExcelModel.fromJson(e)));
+      await Future.delayed(Duration(milliseconds: 200));
+    });
     return data;
   }
 }

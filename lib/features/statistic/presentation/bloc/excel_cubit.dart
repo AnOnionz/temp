@@ -28,8 +28,6 @@ class ExcelCubit extends Cubit<ExcelState> {
   }
   void loadData({@required List<String> allPath}) async {
     emit(ExcelLoading());
-    final totalIndex = allPath.map((e) => int.parse(e.split('=').elementAt(1))).toList();
-    print(totalIndex);
     final data = await fetchAllReport(ReportParams(allPath: allPath));
     emit(data.fold((l) {
       displayError(l);

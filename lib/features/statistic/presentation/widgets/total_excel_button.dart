@@ -8,10 +8,10 @@ import 'package:sp_bill/features/statistic/presentation/bloc/excel_cubit.dart';
 import '../../../../responsive.dart';
 
 class TotalExcelButton extends StatelessWidget {
-  const TotalExcelButton();
+  final bloc = Modular.get<ExcelCubit>();
   @override
   Widget build(BuildContext context) {
-    final bloc = Modular.get<ExcelCubit>();
+    print('build');
     return BlocConsumer<ExcelCubit, ExcelState>(
         bloc: bloc,
         listener: (context, state) {
@@ -20,7 +20,7 @@ class TotalExcelButton extends StatelessWidget {
           }
         },
         builder: (context, state) {
-          if(state is ExcelLoading) {
+          if(state is ExcelLoading || state is ExcelLoadedPart) {
             return Align(
               alignment: Alignment.topRight,
               child: ElevatedButton(

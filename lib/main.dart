@@ -1,14 +1,16 @@
 
 import 'package:flutter/material.dart';
 import 'package:asuka/asuka.dart' show builder;
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:sp_bill/simple_bloc.dart';
 import 'package:url_strategy/url_strategy.dart';
 import 'route/app_module.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  //Bloc.observer = SimpleBlocObserver();
+  Bloc.observer = SimpleBlocObserver();
   setPathUrlStrategy();
     runApp(
         ModularApp(
