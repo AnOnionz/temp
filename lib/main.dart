@@ -10,7 +10,7 @@ import 'route/app_module.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Bloc.observer = SimpleBlocObserver();
+  //Bloc.observer = SimpleBlocObserver();
   setPathUrlStrategy();
     runApp(
         ModularApp(

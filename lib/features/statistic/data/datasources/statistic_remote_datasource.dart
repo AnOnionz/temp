@@ -91,11 +91,12 @@ class StatisticRemoteDataSourceImpl implements StatisticRemoteDataSource{
   Future<List<ExcelEntity>> fetchAllReport({List<String> allPath}) async {
     final List<ExcelEntity> data = [];
 
-    await Future.forEach(allPath.sublist(0,2), (url) async {
-      Response _resp = await cDio.getResponse(
-          path: url
-              .split('api/')
-              .last);
+    await Future.forEach(allPath, (url) async {
+      // Response _resp = await cDio.getResponse(
+      //     path: url
+      //         .split('api/')
+      //         .last);
+      Response _resp = await compute(getReport, url.toString());
       data.addAll(
           (_resp.data as List<dynamic>).map((e) => ExcelModel.fromJson(e)));
       await Future.delayed(Duration(milliseconds: 200));
@@ -103,6 +104,10 @@ class StatisticRemoteDataSourceImpl implements StatisticRemoteDataSource{
     return data;
   }
 }
-// Future<Response> getReport(int index) async {
-//   return await Modular.get<CDio>().getResponse(path: 'supervisor/export-detail?page=$index');
-// }
+Future<Response> getReport(String path) async {
+  Response _resp = await Modular.get<CDio>().getResponse(
+      path: path
+          .split('api/')
+          .last);
+  return _resp;
+}

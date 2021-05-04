@@ -17,7 +17,6 @@ class ExcelCubit extends Cubit<ExcelState> {
 
   void loadPart({BillParams f}) async {
     final filter = f ?? BillCubit.filter;
-    print(filter.userId);
     emit(ExcelLoading());
       final part = await fetchAllPart(FetchPathParams(billId: filter.billId, outletCode: filter.outletCode, begin: filter.begin, end: filter.end, status: filter.status));
       emit(part.fold(
