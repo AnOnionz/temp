@@ -1,6 +1,7 @@
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:sp_bill/core/api/myDio.dart';
 import 'package:sp_bill/core/error/Exception.dart';
+import 'package:sp_bill/core/utils/string_tranform.dart';
 import 'package:sp_bill/features/statistic/data/model/bill_detail_model.dart';
 import 'package:sp_bill/features/statistic/data/model/bill_response_model.dart';
 import 'package:sp_bill/features/statistic/data/model/excel_model.dart';
@@ -18,8 +19,8 @@ abstract class StatisticRemoteDataSource {
   Future<UserBillResponse> fetchAllUserBill({int begin,int end, int userId});
   Future<BillResponse> fetchAllBill({int begin, int end, int status, int billId, String outletCode, @required int userId,int page});
   Future<BillDetailEntity> fetchBillDetail({@required String token});
-  Future<List<String>> fetchAllPart({int begin, int end, int status, int billId, String outletCode});
-  Future<List<ExcelEntity>> fetchAllReport({@required List<String> allPath});
+  Future<List<String>> fetchAllPart({int begin, int end, int status, int billId, String outletCode, int userId});
+  Future<List<Map<String, dynamic>>> fetchAllReport({@required List<String> allPath});
 }
 
 class StatisticRemoteDataSourceImpl implements StatisticRemoteDataSource{
@@ -74,7 +75,7 @@ class StatisticRemoteDataSourceImpl implements StatisticRemoteDataSource{
   }
 
   @override
-  Future<List<String>> fetchAllPart({int begin, int end, int status, int billId, String outletCode}) async {
+  Future<List<String>> fetchAllPart({int begin, int end, int status, int billId, String outletCode, int userId}) async {
     Map<String, dynamic> params
     = {
       'bill_id': billId,
@@ -82,24 +83,25 @@ class StatisticRemoteDataSourceImpl implements StatisticRemoteDataSource{
       'begin': begin,
       'end': end,
       'status': status,
+      'user_id': userId,
     };
     Response _resp = await cDio.getResponse(path: 'supervisor/export', data: params);
     return (_resp.data as List<dynamic>).map((e) => e.toString()).toList();
   }
 
   @override
-  Future<List<ExcelEntity>> fetchAllReport({List<String> allPath}) async {
-    final List<ExcelEntity> data = [];
+  Future<List<Map<String, dynamic>>> fetchAllReport({List<String> allPath}) async {
+    final List<Map<String, dynamic>> data = [];
 
     await Future.forEach(allPath, (url) async {
       // Response _resp = await cDio.getResponse(
       //     path: url
       //         .split('api/')
       //         .last);
-      Response _resp = await compute(getReport, url.toString());
+      Response _resp = await getReport(url);
       data.addAll(
-          (_resp.data as List<dynamic>).map((e) => ExcelModel.fromJson(e)));
-      await Future.delayed(Duration(milliseconds: 200));
+          (await compute(parseData, _resp.data as List<dynamic>)));
+      await Future.delayed(Duration(milliseconds: 100));
     });
     return data;
   }
@@ -110,4 +112,23 @@ Future<Response> getReport(String path) async {
           .split('api/')
           .last);
   return _resp;
+}
+List<Map<String, dynamic>> parseData(List<dynamic> json) {
+  return json.map<Map<String, dynamic>>((e) => {
+    'bill_id': e['bill_id'],
+    'outlet_code': e['outlet_code'],
+    'channel': e['channel'],
+    'outlet_name': e['outlet_name'],
+    'province': e['province'],
+    'industry_name': e['industry_name'],
+    'total_bill': moneyTransform(e['total_bill'] ?? 0),
+    'product_name': e['product_name'],
+    'qty': e['qty'],
+    'unit': e['unit'],
+    'unit_price': moneyTransform(e['unit_price'] ?? 0),
+    'total_money': moneyTransform(e['total_money'] ?? 0),
+    'note': e['note'],
+    'created_by': e['created_by'],
+    'created_at': (e['created_at'] as String).split(' ').last.split('/').sublist(0,2).map((e) => int.parse(e)).toList().join('/')
+  }).toList();
 }

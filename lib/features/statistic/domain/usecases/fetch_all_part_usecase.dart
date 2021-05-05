@@ -10,7 +10,7 @@ class FetchAllPartUseCase implements UseCase<List<String>, FetchPathParams>{
   FetchAllPartUseCase({@required this.repository});
   @override
   Future<Either<Failure, List<String>>> call(FetchPathParams params) async {
-    return await repository.fetchAllPath(billId: params.billId, begin: params.begin, end: params.end, status: params.status, outletCode: params.outletCode);
+    return await repository.fetchAllPath(billId: params.billId, begin: params.begin, end: params.end, status: params.status, outletCode: params.outletCode, userId: params.userId);
   }
 }
 class FetchPathParams extends Params {
@@ -19,6 +19,7 @@ class FetchPathParams extends Params {
   final int status;
   final int billId;
   final String outletCode;
+  final int userId;
 
-  FetchPathParams({this.begin, this.end, this.status, this.billId, this.outletCode});
+  FetchPathParams({this.begin, this.end, this.status, this.billId, this.outletCode, this.userId});
 }

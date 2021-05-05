@@ -25,9 +25,10 @@ class CDio {
   Future<Response> getResponse({@required String path, Map<String, dynamic> data}) async {
     try {
       //print('GET ${client.options.baseUrl}$path');
+      //print(data);
       final response = await client.get(path, queryParameters: data);
         //print('GET $path: ${response.data}');
-      //print(response.requestOptions.path);
+       // print(response.requestOptions.path);
         if (response.statusCode == 200) {
           return response;
         }
@@ -54,7 +55,7 @@ class CDio {
       try {
         // print('POST ${client.options.baseUrl}$path');
         final response = await client.post(path, data: data);
-        print('POST $path: ${response.data}');
+        //print('POST $path: ${response.data}');
         if (response.statusCode == 200 ) {
           return response;
         }

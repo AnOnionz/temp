@@ -88,7 +88,7 @@ class StatisticRepositoryImpl implements StatisticRepository{
   @override
   Future<Either<Failure, List<String>>> fetchAllPath({int begin, int end, int status, int billId, String outletCode, @required int userId}) async {
     try {
-      final parts = await remoteDataSource.fetchAllPart(outletCode: outletCode, status: status, end: end, begin: begin, billId: billId);
+      final parts = await remoteDataSource.fetchAllPart(outletCode: outletCode, status: status, end: end, begin: begin, billId: billId, userId: userId);
       return Right(parts);
     } on InternetException catch(_){
       return Left(InternetFailure());
@@ -103,7 +103,7 @@ class StatisticRepositoryImpl implements StatisticRepository{
   }
 
   @override
-  Future<Either<Failure, List<ExcelEntity>>> fetchAllReport({List<String> allPath}) async {
+  Future<Either<Failure, List<Map<String, dynamic>>>> fetchAllReport({List<String> allPath}) async {
     try {
       final report = await remoteDataSource.fetchAllReport(allPath: allPath);
       return Right(report);

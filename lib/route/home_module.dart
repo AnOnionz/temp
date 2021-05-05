@@ -46,7 +46,7 @@ class HomeModule extends Module {
     Bind.lazySingleton((i) => FetchBillDetailUseCase(repository: i.get<StatisticRepositoryImpl>())),
     Bind.lazySingleton((i) => StatisticRepositoryImpl(remoteDataSource: i.get<StatisticRemoteDataSourceImpl>(),authenticationBloc: i.get<AuthenticationBloc>())),
     Bind.lazySingleton((i) => StatisticRemoteDataSourceImpl(cDio: i.get<CDio>())),
-    Bind.lazySingleton((i) => ExcelCubit(fetchAllPart: i.get<FetchAllPartUseCase>(), fetchAllReport: i.get<FetchAllReportUseCase>())),
+    Bind.factory((i) => ExcelCubit(fetchAllPart: i.get<FetchAllPartUseCase>(), fetchAllReport: i.get<FetchAllReportUseCase>())),
     Bind.lazySingleton((i) => FetchAllPartUseCase(repository: i.get<StatisticRepositoryImpl>())),
     Bind.lazySingleton((i) => FetchAllReportUseCase(repository: i.get<StatisticRepositoryImpl>()))
   ];
@@ -63,6 +63,10 @@ class HomeModule extends Module {
     ChildRoute(
       '/statistic/:id',
       child: (_, args) => AuthenticateWidget(child: Bills(id: args.params['id'])),
+    ),
+    ChildRoute(
+      '/statistic/:id/:time',
+      child: (_, args) => AuthenticateWidget(child: Bills(id: args.params['id'], time: args.params['time'],)),
     ),
   ];
 }

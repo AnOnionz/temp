@@ -10,7 +10,7 @@ class ExcelLoadedPart extends ExcelState {
   ExcelLoadedPart({this.allPath});
 }
 class ExcelFetchSuccess extends ExcelState {
-  final List<ExcelEntity> data;
+  final List<Map<String, dynamic>> data;
 
   ExcelFetchSuccess({this.data});
 }

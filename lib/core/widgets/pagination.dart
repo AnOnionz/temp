@@ -52,7 +52,7 @@ class _PaginationState extends State<Pagination> {
                   currentIndex = 1;
                 });
                 widget.callback(currentIndex);
-              }, child: Container(child: Icon(Icons.arrow_back_ios_outlined),))
+              }, child: Container(padding: const EdgeInsets.symmetric(horizontal: 5), child: Icon(Icons.arrow_back_ios_outlined),))
         ],...List.generate(3, (index) {
           return PaginationItem(index: index + widget.total - 5, currentIndex: currentIndex, onPressed: () {
             setState(() {
@@ -73,7 +73,7 @@ class _PaginationState extends State<Pagination> {
                     currentIndex = 1;
                   });
                   widget.callback(currentIndex);
-                }, child: Container(child: Icon(Icons.arrow_back_ios_outlined),))
+                }, child: Container(padding: const EdgeInsets.symmetric(horizontal: 5), child: Icon(Icons.arrow_back_ios_outlined),))
           ] : [],...List.generate(widget.total, (index) {
             return PaginationItem(index: index + 1, currentIndex: currentIndex, onPressed: () {
               setState(() {

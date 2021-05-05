@@ -12,7 +12,7 @@ abstract class StatisticRepository{
   Future<Either<Failure, UserBillResponse>> fetchAllUserBill({int begin,int end, int userId});
   Future<Either<Failure, BillResponse>> fetchAllBill({int begin, int end, int status, int billId, String outletCode, @required int userId, int page});
   Future<Either<Failure, BillDetailEntity>> fetchBillDetail({@required String token});
-  Future<Either<Failure, List<String>>> fetchAllPath({int begin, int end, int status, int billId, String outletCode});
-  Future<Either<Failure, List<ExcelEntity>>> fetchAllReport({@required List<String> allPath});
+  Future<Either<Failure, List<String>>> fetchAllPath({int begin, int end, int status, int billId, String outletCode, int userId});
+  Future<Either<Failure, List<Map<String, dynamic>>>> fetchAllReport({@required List<String> allPath});
 
 }

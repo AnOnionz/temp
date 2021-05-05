@@ -18,7 +18,7 @@ String _mappingTitle(String title){
     case 'total_money' : return 'Tổng tiền';
     case 'note': return 'Ghi Chú';
     case 'created_by' : return 'Nhân Viên Nhập';
-    case ' created_at' : return 'Ngày Nhập';
+    case 'created_at' : return 'Ngày Nhập';
     default: return title;
   }
 

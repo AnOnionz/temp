@@ -21,7 +21,7 @@ class _ImageViewState extends State<ImageView> {
 
   Future<ui.Image> getImage(String path) async {
     Completer<ImageInfo> completer = Completer();
-    var img = new NetworkImage(path);
+    var img = NetworkImage(path);
     img.resolve(ImageConfiguration()).addListener(ImageStreamListener((ImageInfo info,bool _){
       completer.complete(info);
     }));
@@ -37,6 +37,7 @@ class _ImageViewState extends State<ImageView> {
 
   @override
   Widget build(BuildContext context) {
+
     return Column(
       children: [
         Expanded(
@@ -46,7 +47,7 @@ class _ImageViewState extends State<ImageView> {
             child: InteractiveViewer(
               child: RotatedBox(
                 quarterTurns: imageItems[_imgSelected].rotate,
-                child: Image.network(imageItems[_imgSelected].url),
+                child: Image.network(imageItems[_imgSelected].url,),
               ),
             ),
           )

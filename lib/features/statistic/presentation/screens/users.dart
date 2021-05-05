@@ -198,11 +198,18 @@ class _UsersState extends State<Users> {
                       ),
                     ),
                     Expanded(
-                      child: BlocBuilder<UserBillCubit, UserBillState>(
+                      child: BlocConsumer<UserBillCubit, UserBillState>(
                         bloc: Modular.get<UserBillCubit>(),
+                        listener: (context, state) {
+                          if(state is UserBillLoaded){
+                            setState(() {
+                              data = state.response.userBills.chunked(20).toList();
+                            });
+                          }
+                        },
                         builder: (context, state) {
                           if(state is UserBillLoaded){
-                            data = state.response.userBills.chunked(20).toList();
+
                             return data.isNotEmpty ? JDataTable(
                               label: 'Tổng số phiếu đã nhập liệu: ',
                               value: state.response.userBills.fold(0, (previousValue, element) => previousValue + element.done),
@@ -218,7 +225,7 @@ class _UsersState extends State<Users> {
                                   children: [
                                     Container(
                                         width: size.width /15,
-                                        child: Text('${index +1}')),
+                                        child: Text('${index +1 + (_currentPage - 1) * 10 }')),
                                     Container( width: size.width /7, child: Text(data[_currentPage-1][index].userName, style: kBlackSmallText,)),
                                     Container( width: size.width /7, child: Text(data[_currentPage-1][index].time, style: kBlackSmallText,)),
                                     Container( width: size.width /7, child: Text(data[_currentPage-1][index].done.toString(), style: kBlackSmallText,)),
@@ -227,7 +234,7 @@ class _UsersState extends State<Users> {
                                     Container( width: size.width/15, child: Center(child:
                                     HoverButton(
                                       onPressed: (){
-                                        Modular.to.pushNamed('/statistic/${data[_currentPage-1][index].userId}');
+                                        Modular.to.pushNamed('/statistic/${data[_currentPage-1][index].userId}/${data[_currentPage-1][index].time.split('/').join('_')}');
                                       },
                                       icon: Image.asset('assets/images/asign.png', height: 16, width: 16,),
                                       onActive: Image.asset('assets/images/asign_hover.png', height: 16, width: 16,),

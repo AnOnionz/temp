@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 import 'package:sp_bill/core/utils/dialogs.dart';
 import 'package:sp_bill/features/statistic/domain/entities/bill_response.dart';
@@ -15,9 +16,10 @@ class BillCubit extends Cubit<BillState> {
   BillCubit({@required this.fetchAllBill}) : super(BillInitial());
 
   void fetchBill({int begin, int end, int status, int billId, String outletCode , int userId}) async {
-    filter = BillParams(userId: userId, begin: begin, end: end, outletCode: outletCode, billId: billId, status: status);
+    final nBegin = begin != null ? begin + DateTime.now().hour*3600 : null;
+    final nEnd = end !=null ? end +  DateTime.now().minute*60 : null;
+    filter = BillParams(userId: userId, begin: nBegin, end: nEnd, outletCode: outletCode, billId: billId, status: status);
     final bills = await fetchAllBill(filter);
-    Future.delayed(Duration(milliseconds: 500), (){ Modular.get<ExcelCubit>().loadPart(f: filter);});
     emit(bills.fold((l) {
       displayError(l);
       return BillLoadFailure();}, (r) => BillLoaded(response: r)));

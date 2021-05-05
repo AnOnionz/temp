@@ -23,8 +23,9 @@ import '../../../../responsive.dart';
 
 class Bills extends StatefulWidget {
   final String id;
+  final String time;
 
-  Bills({Key key, @required this.id}) : super(key: key);
+  Bills({Key key, @required this.id, this.time}) : super(key: key);
 
   @override
   _BillsState createState() => _BillsState();
@@ -41,7 +42,7 @@ class _BillsState extends State<Bills> {
 
   List<Map<String, dynamic>> exData = [];
   List<BillEntity> data = [];
-  int currentIndex;
+  int currentIndex = 1;
 
 
   final _header = {
@@ -63,7 +64,8 @@ class _BillsState extends State<Bills> {
 
   @override
   void initState() {
-    billCubit.fetchBill(userId: int.parse(widget.id));
+    _dateController.text = widget.time != '' ? '${widget.time.split('_').join('/')} - ${widget.time.split('_').join('/')}' : '';
+    billCubit.fetchBill(userId: int.parse(widget.id), begin: DateFormat("dd-MM-yyyy").parse(widget.time.split('_').join('-')).millisecondsSinceEpoch~/1000, end: DateFormat("dd-MM-yyyy").parse(widget.time.split('_').join('-')).millisecondsSinceEpoch~/1000 );
     super.initState();
   }
 
@@ -300,7 +302,7 @@ class _BillsState extends State<Bills> {
                                       children: [
                                         Container(
                                             width: size.width / 25,
-                                            child: Text('${index + 1}')),
+                                            child: Text('${index +1 + (currentIndex - 1) * 20 }')),
                                         Container(
                                             width: size.width / 10,
                                             child: Text(
@@ -403,7 +405,7 @@ class _BillsState extends State<Bills> {
                         bloc: billCubit,
                         builder: (context, state) {
                           if(state is BillLoaded){
-                            return state.response.bills.isNotEmpty && state.response.bills.length >= 20 ? Pagination(current: currentIndex, total: state.response.totalPage, callback: (index) {
+                            return state.response.bills.isNotEmpty ? Pagination(current: currentIndex, total: state.response.totalPage, callback: (index) {
                               billCubit.fetchIndexPage(page: index);
                               setState(() {
                                 currentIndex = index;
