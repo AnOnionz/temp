@@ -5,7 +5,10 @@ import 'package:sp_bill/features/statistic/presentation/bloc/excel_cubit.dart';
 
 
 class TotalExcelButton extends StatelessWidget {
+  final String user;
   final bloc = Modular.get<ExcelCubit>();
+
+  TotalExcelButton({Key key, this.user}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ExcelCubit, ExcelState>(
@@ -20,7 +23,7 @@ class TotalExcelButton extends StatelessWidget {
                         horizontal: 20, vertical: 16) //
                 ),
                 onPressed: () {
-                  bloc.loadPart();
+                  bloc.loadPart(user: user);
                 },
                 child: Text('xuất excel'),
               ),
@@ -38,7 +41,7 @@ class TotalExcelButton extends StatelessWidget {
                             horizontal: 20, vertical: 16) //
                     ),
                     onPressed: () {
-                      bloc.loadPart();
+                      bloc.loadPart(user: user);
                     },
                     child: Text('thử lại'),
                   ),

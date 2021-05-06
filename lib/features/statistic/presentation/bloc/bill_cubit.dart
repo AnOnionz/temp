@@ -38,7 +38,4 @@ class BillCubit extends Cubit<BillState> {
       displayError(l);
       return BillLoadFailure();}, (r) => BillLoaded(response: r)));
   }
-  void fetchAllPart(){
-
-  }
 }

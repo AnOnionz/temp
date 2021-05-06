@@ -43,6 +43,8 @@ class _BillsState extends State<Bills> {
   List<Map<String, dynamic>> exData = [];
   List<BillEntity> data = [];
   int currentIndex = 1;
+  String user = '';
+  int totalPage = 1;
 
 
   final _header = {
@@ -65,6 +67,7 @@ class _BillsState extends State<Bills> {
   @override
   void initState() {
     _dateController.text = widget.time != '' ? '${widget.time.split('_').join('/')} - ${widget.time.split('_').join('/')}' : '';
+    _selectedDate = DateTimeRange(start: DateFormat("dd-MM-yyyy").parse(widget.time.split('_').join('-')), end: DateFormat("dd-MM-yyyy").parse(widget.time.split('_').join('-')));
     billCubit.fetchBill(userId: int.parse(widget.id), begin: DateFormat("dd-MM-yyyy").parse(widget.time.split('_').join('-')).millisecondsSinceEpoch~/1000, end: DateFormat("dd-MM-yyyy").parse(widget.time.split('_').join('-')).millisecondsSinceEpoch~/1000 );
     super.initState();
   }
@@ -87,7 +90,7 @@ class _BillsState extends State<Bills> {
                   const EdgeInsets.only(top: 38.0, right: 38.0, left: 38.0),
               child: Stack(
                 children: [
-                  TotalExcelButton(),
+                 TotalExcelButton(user: user,),
                   // BlocBuilder<BillCubit, BillState>(
                   //     bloc: billCubit,
                   //     builder: (context, state) {
@@ -152,8 +155,15 @@ class _BillsState extends State<Bills> {
                                 label: 'User nhập liệu',
                                 width: size.width / 8,
                                 disable: true,
-                                child: BlocBuilder<UsersCubit, FetchUsersState>(
+                                child: BlocConsumer<UsersCubit, FetchUsersState>(
                                   bloc: Modular.get<UsersCubit>()..fetchUsers(),
+                                  listener: (context, state) {
+                                    if(state is FetchUsersLoaded){
+                                      setState(() {
+                                        user = state.users.firstWhere((element) => element.id == int.parse(widget.id)).userName;
+                                      });
+                                    }
+                                  },
                                   builder: (context, state) {
                                     if (state is FetchUsersLoaded) {
                                       return DropdownButtonHideUnderline(
@@ -251,14 +261,18 @@ class _BillsState extends State<Bills> {
 
                              ElevatedButton(
                                onPressed: () {
+                                 setState(() {
+                                   currentIndex = 1;
+                                 });
                                  billCubit.fetchBill(
                                    userId: int.parse(widget.id),
-                                   outletCode: _outletCodeController.text.isEmpty? null :_outletCodeController.text ,
+                                   outletCode: _outletCodeController.text.isEmpty ? null :_outletCodeController.text ,
                                    billId: _billIDController.text.isEmpty ? null :int.parse(_billIDController.text),
                                    begin: _selectedDate != null ? _selectedDate.start.millisecondsSinceEpoch ~/1000 : null,
                                    end: _selectedDate != null ? _selectedDate.end.millisecondsSinceEpoch ~/1000 : null,
                                    status: _selectedStatus != null ? int.parse(_selectedStatus) : null,
                                  );
+
 
                                },
                                child: Text(
@@ -275,151 +289,146 @@ class _BillsState extends State<Bills> {
                           ),
                         ),
                       ),
-                      Expanded(
-                        child: BlocBuilder<BillCubit, BillState>(
-                          bloc: billCubit,
-                          builder: (context, state) {
-                            if (state is BillLoaded) {
-                              data = state.response.bills;
-                              return JDataTable(
-                                // label: 'Kết quả: ',
-                                // value: state.response.,
-                                // labelStyle: kRedText,
-                                // valueStyle: kRedText,
-                                maxHeight: size.height - 415,
-                                headerData: _header,
-                                body: data.isNotEmpty ? ListView.separated(
-                                  controller: _scrollController,
-                                  separatorBuilder: (context, index) => Divider(
-                                    color: kGreyColor,
-                                  ),
-                                  itemBuilder: (context, index) => Padding(
-                                    padding:
-                                        const EdgeInsets.symmetric(vertical: 7.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Container(
-                                            width: size.width / 25,
-                                            child: Text('${index +1 + (currentIndex - 1) * 20 }')),
-                                        Container(
-                                            width: size.width / 10,
-                                            child: Text(
-                                              data[index].id.toString(),
-                                              style: kBlackSmallText,
-                                            )),
-                                        Container(
-                                            width: size.width / 10,
-                                            child: Text(
-                                              data[index].outletCode,
-                                              style: kBlackSmallText,
-                                            )),
-                                        Container(
-                                            width: size.width / 7,
-                                            child: Text(
-                                              data[index].outletName,
-                                              style: kBlackSmallText,
-                                            )),
-                                        Container(
-                                            width: size.width / 10,
-                                            child: Text(
-                                              displayPrice(data[index].totalBill),
-                                              style: kBlackSmallText,
-                                            )),
-                                        Container(
-                                            width: size.width / 10,
-                                            child: Text(
-                                              data[index].userName,
-                                              style: kBlackSmallText,
-                                            )),
-                                        Container(
-                                            width: size.width / 10,
-                                            child: Text(
-                                              data[index].doneAt,
-                                              style: kBlackSmallText,
-                                            )),
-                                        Container(
-                                            width: size.width / 10,
-                                            child: StatusBill(
-                                                status: data[index].status)),
-                                        Container(
-                                            width: size.width / 25,
-                                            child: Center(
-                                              child: HoverButton(
-                                                onPressed: () {
-                                                  Modular.to.pushNamed(
-                                                      '/bill/${data[index].token}');
-                                                },
-                                                icon: Icon(Icons.remove_red_eye_sharp, color: Colors.black54,),
-                                                onActive: Icon(Icons.remove_red_eye_sharp, color: kGreenColor,),
-                                              ),
-                                            )),
-                                      ],
-                                    ),
-                                  ),
-                                  itemCount: data.length,
-                                  shrinkWrap: true,
-                                ): Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 30),
-                                  child: Center(child: Text('Danh sách trống', style: kGreySmallText,)),
-                                ),
-                              );
-                            }
-                            if(state is BillLoadFailure){
-                              return JDataTable(
-                                // label: 'Kết quả: ',
-                                // value: 0,
-                                // labelStyle: kRedText,
-                                // valueStyle: kRedText,
-                                  maxHeight: size.height * 0.6,
+                      BlocBuilder<BillCubit, BillState>(
+                        bloc: billCubit,
+                        builder: (context, state) {
+                          if (state is BillLoaded) {
+                            print(state.response.currentPage);
+                            data = state.response.bills;
+                            return Column(
+                              children: [
+                                JDataTable(
+                                  // label: 'Kết quả: ',
+                                  // value: state.response.,
+                                  // labelStyle: kRedText,
+                                  // valueStyle: kRedText,
+                                  maxHeight: size.height - 415,
                                   headerData: _header,
-                                  body: Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 30),
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text('Danh sách trống', style: kGreySmallText,),
-                                        const SizedBox(height: 10,),
-                                        ElevatedButton(onPressed: (){
-                                          billCubit.reloadBill();
-                                        }, child: Text('tải lại')),
-                                      ],
+                                  body: data.isNotEmpty ? ListView.separated(
+                                    controller: _scrollController,
+                                    separatorBuilder: (context, index) => Divider(
+                                      color: kGreyColor,
                                     ),
-                                  )
-                              );
-                            }
+                                    itemBuilder: (context, index) => Padding(
+                                      padding:
+                                      const EdgeInsets.symmetric(vertical: 7.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Container(
+                                              width: size.width / 25,
+                                              child: Text('${index + 1 + (state.response.currentPage == 0 ? state.response.currentPage : state.response.currentPage-1) * 20 }')),
+                                          Container(
+                                              width: size.width / 10,
+                                              child: Text(
+                                                data[index].id.toString(),
+                                                style: kBlackSmallText,
+                                              )),
+                                          Container(
+                                              width: size.width / 10,
+                                              child: Text(
+                                                data[index].outletCode,
+                                                style: kBlackSmallText,
+                                              )),
+                                          Container(
+                                              width: size.width / 7,
+                                              child: Text(
+                                                data[index].outletName,
+                                                style: kBlackSmallText,
+                                              )),
+                                          Container(
+                                              width: size.width / 10,
+                                              child: Text(
+                                                displayPrice(data[index].totalBill),
+                                                style: kBlackSmallText,
+                                              )),
+                                          Container(
+                                              width: size.width / 10,
+                                              child: Text(
+                                                data[index].userName,
+                                                style: kBlackSmallText,
+                                              )),
+                                          Container(
+                                              width: size.width / 10,
+                                              child: Text(
+                                                data[index].doneAt,
+                                                style: kBlackSmallText,
+                                              )),
+                                          Container(
+                                              width: size.width / 10,
+                                              child: StatusBill(
+                                                  status: data[index].status)),
+                                          Container(
+                                              width: size.width / 25,
+                                              child: Center(
+                                                child: HoverButton(
+                                                  onPressed: () {
+                                                    Modular.to.pushNamed(
+                                                        '/bill/${data[index].token}');
+                                                  },
+                                                  icon: Icon(Icons.remove_red_eye_sharp, color: Colors.black54,),
+                                                  onActive: Icon(Icons.remove_red_eye_sharp, color: kGreenColor,),
+                                                ),
+                                              )),
+                                        ],
+                                      ),
+                                    ),
+                                    itemCount: data.length,
+                                    shrinkWrap: true,
+                                  ): Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 30),
+                                    child: Center(child: Text('Danh sách trống', style: kGreySmallText,)),
+                                  ),
+                                ),
+                                Pagination(current: state.response.currentPage == 0 ? 1 : state.response.currentPage, total: state.response.totalPage, callback: (index) {
+                                  billCubit.fetchIndexPage(page: index);
+                                  // setState(() {
+                                  //   currentIndex = index;
+                                  //   _scrollController.animateTo(
+                                  //     _scrollController.position.minScrollExtent,
+                                  //     curve: Curves.easeOut,
+                                  //     duration: const Duration(milliseconds: 100),
+                                  //   );
+                                  // });
+                                },)
+                              ],
+                            );
+                          }
+                          if(state is BillLoadFailure){
                             return JDataTable(
                               // label: 'Kết quả: ',
                               // value: 0,
                               // labelStyle: kRedText,
                               // valueStyle: kRedText,
+                                maxHeight: size.height * 0.6,
+                                headerData: _header,
+                                body: Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 30),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text('Danh sách trống', style: kGreySmallText,),
+                                      const SizedBox(height: 10,),
+                                      ElevatedButton(onPressed: (){
+                                        billCubit.reloadBill();
+                                      }, child: Text('tải lại')),
+                                    ],
+                                  ),
+                                )
+                            );
+                          }
+                          return JDataTable(
+                            // label: 'Kết quả: ',
+                            // value: 0,
+                            // labelStyle: kRedText,
+                            // valueStyle: kRedText,
                               maxHeight: size.height * 0.6,
                               headerData: _header,
                               body: Center(child: Container(height: 60, width: 60, child: CircularProgressIndicator(),),)
-                            );
-                          },
-                        ),
-                      ),
-                      BlocBuilder<BillCubit, BillState>(
-                        bloc: billCubit,
-                        builder: (context, state) {
-                          if(state is BillLoaded){
-                            return state.response.bills.isNotEmpty ? Pagination(current: currentIndex, total: state.response.totalPage, callback: (index) {
-                              billCubit.fetchIndexPage(page: index);
-                              setState(() {
-                                currentIndex = index;
-                                _scrollController.animateTo(
-                                  _scrollController.position.minScrollExtent,
-                                  curve: Curves.easeOut,
-                                  duration: const Duration(milliseconds: 100),
-                                );
-                              });
-                            },) : Container();
-                          }
-                          return Container();
+                          );
                         },
-                      ),
+                      )
                     ],
                   ),
                 ],

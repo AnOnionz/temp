@@ -17,10 +17,12 @@ class _PaginationState extends State<Pagination> {
   @override
   void initState() {
     super.initState();
-    currentIndex = widget.current ?? 1;
+    currentIndex  = widget.current ?? 1;
   }
+
   @override
   Widget build(BuildContext context) {
+
     return Padding(
       padding: const EdgeInsets.only(right: 55, bottom: 10),
       child: Row(
@@ -36,13 +38,13 @@ class _PaginationState extends State<Pagination> {
         ], ...List.generate(3, (index) {
           return PaginationItem(index: index + currentIndex, currentIndex: currentIndex, onPressed: () {
             setState(() {
-              currentIndex = index + currentIndex ;
+              currentIndex = index + currentIndex;
             });
             widget.callback(currentIndex);
           },);}), ...[Container(height:33, width:33, alignment: Alignment.bottomCenter, child: Text('....',))], ...List.generate(3, (index) {
           return PaginationItem(index: index + widget.total - 3+1, currentIndex: currentIndex, onPressed: () {
             setState(() {
-              currentIndex = index + widget.total - 3+1;
+              currentIndex = index + widget.total - 3 + 1;
             });
             widget.callback(currentIndex);
           },);})]:[...[
@@ -84,6 +86,13 @@ class _PaginationState extends State<Pagination> {
 
       ),
     );
+  }
+  @override
+  void didUpdateWidget(covariant Pagination oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.current == 1) {
+      currentIndex = 1;
+    }
   }
 }
 

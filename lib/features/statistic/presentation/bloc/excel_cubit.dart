@@ -16,7 +16,7 @@ class ExcelCubit extends Cubit<ExcelState> {
   final FetchAllReportUseCase fetchAllReport;
   ExcelCubit({@required this.fetchAllPart, @required this.fetchAllReport}) : super(ExcelInitial());
 
-  void loadPart({BillParams f}) async {
+  void loadPart({BillParams f, String user}) async {
     final filter = f ?? BillCubit.filter;
     emit(ExcelLoading());
       final part = await fetchAllPart(FetchPathParams(billId: filter.billId, outletCode: filter.outletCode, begin: filter.begin, end: filter.end, status: filter.status, userId: filter.userId));
@@ -25,17 +25,17 @@ class ExcelCubit extends Cubit<ExcelState> {
         displayError(l);
         return ExcelFailure();},
               (r) {
-                loadData(allPath: r);
+                loadData(allPath: r, user: user);
              return ExcelLoadedPart(allPath: r); }));
   }
-  void loadData({@required List<String> allPath}) async {
+  void loadData({@required List<String> allPath, String user}) async {
     emit(ExcelLoading());
     final data = await fetchAllReport(ReportParams(allPath: allPath));
     emit(data.fold((l) {
       displayError(l);
       return ExcelFailure();},
       (r) {
-      exportExcel(data: r, name: 'total ' + DateFormat('dd/MM').format(DateTime.fromMillisecondsSinceEpoch(BillCubit.filter.begin*1000)) + '-' + DateFormat('dd/MM').format(DateTime.fromMillisecondsSinceEpoch(BillCubit.filter.end*1000)));
+      exportExcel(data: r, name: user + '-at-' + DateFormat('dd/MM').format(DateTime.fromMillisecondsSinceEpoch(BillCubit.filter.begin*1000)).split('_').join('/') + '-' + DateFormat('dd/MM').format(DateTime.fromMillisecondsSinceEpoch(BillCubit.filter.end*1000)).split('_').join('/'));
       return ExcelFetchSuccess(data: r);}));
   }
 }
