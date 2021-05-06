@@ -11,6 +11,7 @@ import 'package:sp_bill/core/widgets/pagination.dart';
 import 'package:sp_bill/core/widgets/single_filed.dart';
 import 'package:sp_bill/features/login/presentation/blocs/authentication_bloc.dart';
 import 'package:sp_bill/features/statistic/domain/entities/bill.dart';
+import 'package:sp_bill/features/statistic/domain/entities/user.dart';
 import 'package:sp_bill/features/statistic/presentation/bloc/bill_cubit.dart';
 import 'package:sp_bill/features/statistic/presentation/bloc/users_cubit.dart';
 import 'package:sp_bill/features/statistic/presentation/widgets/status_bill.dart';
@@ -43,9 +44,9 @@ class _BillsState extends State<Bills> {
   List<Map<String, dynamic>> exData = [];
   List<BillEntity> data = [];
   int currentIndex = 1;
-  String user = '';
+  String _selectedUser ;
+  int _selectedId ;
   int totalPage = 1;
-
 
   final _header = {
     '#': 25,
@@ -66,9 +67,24 @@ class _BillsState extends State<Bills> {
 
   @override
   void initState() {
-    _dateController.text = widget.time != '' ? '${widget.time.split('_').join('/')} - ${widget.time.split('_').join('/')}' : '';
-    _selectedDate = DateTimeRange(start: DateFormat("dd-MM-yyyy").parse(widget.time.split('_').join('-')), end: DateFormat("dd-MM-yyyy").parse(widget.time.split('_').join('-')));
-    billCubit.fetchBill(userId: int.parse(widget.id), begin: DateFormat("dd-MM-yyyy").parse(widget.time.split('_').join('-')).millisecondsSinceEpoch~/1000, end: DateFormat("dd-MM-yyyy").parse(widget.time.split('_').join('-')).millisecondsSinceEpoch~/1000 );
+    _selectedId = int.parse(widget.id);
+    _selectedUser = UsersCubit.allUser.firstWhere((element) => element.id.toString() == widget.id).userName;
+    _dateController.text = widget.time != ''
+        ? '${widget.time.split('_').join('/')} - ${widget.time.split('_').join('/')}'
+        : '';
+    _selectedDate = DateTimeRange(
+        start: DateFormat("dd-MM-yyyy").parse(widget.time.split('_').join('-')),
+        end: DateFormat("dd-MM-yyyy").parse(widget.time.split('_').join('-')));
+    billCubit.fetchBill(
+        userId: int.parse(widget.id),
+        begin: DateFormat("dd-MM-yyyy")
+                .parse(widget.time.split('_').join('-'))
+                .millisecondsSinceEpoch ~/
+            1000,
+        end: DateFormat("dd-MM-yyyy")
+                .parse(widget.time.split('_').join('-'))
+                .millisecondsSinceEpoch ~/
+            1000);
     super.initState();
   }
 
@@ -81,7 +97,10 @@ class _BillsState extends State<Bills> {
       desktop: Column(
         children: [
           NavBar(
-            userName: (Modular.get<AuthenticationBloc>().state as AuthenticationAuthenticated).user.userName,
+            userName: (Modular.get<AuthenticationBloc>().state
+                    as AuthenticationAuthenticated)
+                .user
+                .userName,
             index: 5,
           ),
           Expanded(
@@ -90,29 +109,9 @@ class _BillsState extends State<Bills> {
                   const EdgeInsets.only(top: 38.0, right: 38.0, left: 38.0),
               child: Stack(
                 children: [
-                 TotalExcelButton(user: user,),
-                  // BlocBuilder<BillCubit, BillState>(
-                  //     bloc: billCubit,
-                  //     builder: (context, state) {
-                  //       if (state is BillLoaded) {
-                  //         exData = state.response.bills.map((e) => e.toJson()).toList();
-                  //         return Align(
-                  //           alignment: Alignment.topRight,
-                  //           child: exData.isNotEmpty ? ElevatedButton(
-                  //             style: ElevatedButton.styleFrom(
-                  //                 padding: const EdgeInsets.symmetric(
-                  //                     horizontal: 20, vertical: 16) //
-                  //             ),
-                  //             onPressed: () {
-                  //               exportExcel(data: exData, name: 'bill');
-                  //             },
-                  //             child: Text('xuất excel'),
-                  //           ) : const SizedBox(),
-                  //         );
-                  //       }
-                  //       return const SizedBox();
-                  //     }
-                  // ),
+                  TotalExcelButton(
+                    user: _selectedUser,
+                  ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -129,73 +128,55 @@ class _BillsState extends State<Bills> {
                                 width: size.width / 8,
                                 controller: _billIDController,
                                 inputFormatter: <TextInputFormatter>[
-                                  LengthLimitingTextInputFormatter(
-                                      15),
-                                  FilteringTextInputFormatter
-                                      .digitsOnly,
-                                  FilteringTextInputFormatter
-                                      .allow(RegExp(r'[0-9]'))
+                                  LengthLimitingTextInputFormatter(15),
+                                  FilteringTextInputFormatter.digitsOnly,
+                                  FilteringTextInputFormatter.allow(
+                                      RegExp(r'[0-9]'))
                                 ],
-
                               ),
                               SingleField(
                                 label: 'Outlet code',
                                 width: size.width / 8,
                                 controller: _outletCodeController,
                                 inputFormatter: <TextInputFormatter>[
-                                  LengthLimitingTextInputFormatter(
-                                      15),
-                                  FilteringTextInputFormatter
-                                      .digitsOnly,
-                                  FilteringTextInputFormatter
-                                      .allow(RegExp(r'[0-9]'))
+                                  LengthLimitingTextInputFormatter(15),
+                                  FilteringTextInputFormatter.digitsOnly,
+                                  FilteringTextInputFormatter.allow(
+                                      RegExp(r'[0-9]'))
                                 ],
                               ),
                               DropdownField(
-                                label: 'User nhập liệu',
-                                width: size.width / 8,
-                                disable: true,
-                                child: BlocConsumer<UsersCubit, FetchUsersState>(
-                                  bloc: Modular.get<UsersCubit>()..fetchUsers(),
-                                  listener: (context, state) {
-                                    if(state is FetchUsersLoaded){
+                                label: 'User',
+                                width: 230,
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton<String>(
+                                    value: _selectedUser,
+                                    underline: Container(
+                                      color: Colors.black,
+                                      height: 3,
+                                    ),
+                                    icon: Icon(Icons.keyboard_arrow_down),
+                                    isDense: true,
+                                    onChanged: (String newValue) {
                                       setState(() {
-                                        user = state.users.firstWhere((element) => element.id == int.parse(widget.id)).userName;
+                                        if (newValue != null) {
+                                          _selectedUser = newValue;
+                                        }
                                       });
-                                    }
-                                  },
-                                  builder: (context, state) {
-                                    if (state is FetchUsersLoaded) {
-                                      return DropdownButtonHideUnderline(
-                                        child: DropdownButton<String>(
-                                          icon: Icon(Icons.keyboard_arrow_down),
-                                          value: state.users.firstWhere((element) => element.id == int.parse(widget.id)).userName,
-                                          style: kBlackSmallText,
-                                          isDense: true,
-                                          items: [
-                                            DropdownMenuItem<String>(
-                                              value: state.users.firstWhere((element) => element.id == int.parse(widget.id)).userName,
-                                              child: Text(state.users.firstWhere((element) => element.id == int.parse(widget.id)).userName),
-                                            )
-                                          ],
-                                        ),
+                                    },
+                                    items: UsersCubit.allUser
+                                        .map((UserEntity user) {
+                                      return DropdownMenuItem<String>(
+                                        value: user.userName,
+                                        child: Text(user.userName),
+                                        onTap: () {
+                                          setState(() {
+                                            _selectedId = user.id;
+                                          });
+                                        },
                                       );
-                                    }
-                                    return DropdownButtonHideUnderline(
-                                      child: DropdownButton<String>(
-                                        icon: Icon(Icons.keyboard_arrow_down),
-                                        value: '',
-                                        style: kBlackSmallText,
-                                        isDense: true,
-                                        items: [
-                                          DropdownMenuItem<String>(
-                                            value: '',
-                                            child: Text(''),
-                                          )
-                                        ],
-                                      ),
-                                    );
-                                  },
+                                    }).toList(),
+                                  ),
                                 ),
                               ),
                               DateTimeField(
@@ -215,76 +196,97 @@ class _BillsState extends State<Bills> {
                                     setState(() {
                                       _selectedDate = rangeDate;
                                     });
-                                    _dateController.text = DateFormat('dd/MM/yyyy')
-                                            .format(rangeDate.start)
-                                            .toString() +
-                                        ' - ' +
+                                    _dateController.text =
                                         DateFormat('dd/MM/yyyy')
-                                            .format(rangeDate.end)
-                                            .toString();
+                                                .format(rangeDate.start)
+                                                .toString() +
+                                            ' - ' +
+                                            DateFormat('dd/MM/yyyy')
+                                                .format(rangeDate.end)
+                                                .toString();
                                   }
                                 },
                               ),
-                            DropdownField(label: 'Tình trạng' ,width: 230,
-                              child: DropdownButtonHideUnderline(
-                              child: DropdownButton<String>(
-                              icon: InkWell(
-                                onTap: (){
-                                  setState(() {
-                                    _selectedStatus = null;
-                                  });
-                                },
-                                  child:_selectedStatus!=null ? Icon(Icons.close, size: 20,) : Icon(Icons.keyboard_arrow_down)),
-                              isDense: true,
-                              value: _selectedStatus,
-                              onChanged: (String newValue) {
-                                setState(() {
-                                  if(newValue!=null) {
-                                    _selectedStatus = newValue;
-                                  }
-                                });
-                              },
-                              items:status.entries
-                                  .map((e) => DropdownMenuItem<String>(
-                                value: e.key,
-                                child: Text(e.value),
-                                onTap: () {
-                                  setState(() {
-                                    _selectedStatus = e.key;
-                                  });
-                                },
-                              ))
-                                  .toList(),
+                              DropdownField(
+                                label: 'Tình trạng',
+                                width: 230,
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton<String>(
+                                    icon: InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            _selectedStatus = null;
+                                          });
+                                        },
+                                        child: _selectedStatus != null
+                                            ? Icon(
+                                                Icons.close,
+                                                size: 20,
+                                              )
+                                            : Icon(Icons.keyboard_arrow_down)),
+                                    isDense: true,
+                                    value: _selectedStatus,
+                                    onChanged: (String newValue) {
+                                      setState(() {
+                                        if (newValue != null) {
+                                          _selectedStatus = newValue;
+                                        }
+                                      });
+                                    },
+                                    items: status.entries
+                                        .map((e) => DropdownMenuItem<String>(
+                                              value: e.key,
+                                              child: Text(e.value),
+                                              onTap: () {
+                                                setState(() {
+                                                  _selectedStatus = e.key;
+                                                });
+                                              },
+                                            ))
+                                        .toList(),
+                                  ),
+                                ),
                               ),
-                             ),
-                            ),
-
-                             ElevatedButton(
-                               onPressed: () {
-                                 setState(() {
-                                   currentIndex = 1;
-                                 });
-                                 billCubit.fetchBill(
-                                   userId: int.parse(widget.id),
-                                   outletCode: _outletCodeController.text.isEmpty ? null :_outletCodeController.text ,
-                                   billId: _billIDController.text.isEmpty ? null :int.parse(_billIDController.text),
-                                   begin: _selectedDate != null ? _selectedDate.start.millisecondsSinceEpoch ~/1000 : null,
-                                   end: _selectedDate != null ? _selectedDate.end.millisecondsSinceEpoch ~/1000 : null,
-                                   status: _selectedStatus != null ? int.parse(_selectedStatus) : null,
-                                 );
-
-
-                               },
-                               child: Text(
-                                 'Tìm',
-                                 style: kWhiteSmallText,
-                               ),
-                               style: ElevatedButton.styleFrom(
-                                   elevation: 0,
-                                   padding: const EdgeInsets.symmetric(
-                                       horizontal: 40, vertical: 16) // foreground
-                                   ),
-                             )
+                              ElevatedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    currentIndex = 1;
+                                  });
+                                  billCubit.fetchBill(
+                                    userId: _selectedId,
+                                    outletCode:
+                                        _outletCodeController.text.isEmpty
+                                            ? null
+                                            : _outletCodeController.text,
+                                    billId: _billIDController.text.isEmpty
+                                        ? null
+                                        : int.parse(_billIDController.text),
+                                    begin: _selectedDate != null
+                                        ? _selectedDate
+                                                .start.millisecondsSinceEpoch ~/
+                                            1000
+                                        : null,
+                                    end: _selectedDate != null
+                                        ? _selectedDate
+                                                .end.millisecondsSinceEpoch ~/
+                                            1000
+                                        : null,
+                                    status: _selectedStatus != null
+                                        ? int.parse(_selectedStatus)
+                                        : null,
+                                  );
+                                },
+                                child: Text(
+                                  'Tìm',
+                                  style: kWhiteSmallText,
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                    elevation: 0,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 40,
+                                        vertical: 16) // foreground
+                                    ),
+                              )
                             ],
                           ),
                         ),
@@ -304,129 +306,171 @@ class _BillsState extends State<Bills> {
                                   // valueStyle: kRedText,
                                   maxHeight: size.height - 415,
                                   headerData: _header,
-                                  body: data.isNotEmpty ? ListView.separated(
-                                    controller: _scrollController,
-                                    separatorBuilder: (context, index) => Divider(
-                                      color: kGreyColor,
-                                    ),
-                                    itemBuilder: (context, index) => Padding(
-                                      padding:
-                                      const EdgeInsets.symmetric(vertical: 7.0),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Container(
-                                              width: size.width / 25,
-                                              child: Text('${index + 1 + (state.response.currentPage == 0 ? state.response.currentPage : state.response.currentPage-1) * 20 }')),
-                                          Container(
-                                              width: size.width / 10,
+                                  body: data.isNotEmpty
+                                      ? ListView.separated(
+                                          controller: _scrollController,
+                                          separatorBuilder: (context, index) =>
+                                              Divider(
+                                            color: kGreyColor,
+                                          ),
+                                          itemBuilder: (context, index) =>
+                                              Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 7.0),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Container(
+                                                    width: size.width / 25,
+                                                    child: Text(
+                                                        '${index + 1 + (state.response.currentPage == 0 ? state.response.currentPage : state.response.currentPage - 1) * 20}')),
+                                                Container(
+                                                    width: size.width / 10,
+                                                    child: Text(
+                                                      data[index].id.toString(),
+                                                      style: kBlackSmallText,
+                                                    )),
+                                                Container(
+                                                    width: size.width / 10,
+                                                    child: Text(
+                                                      data[index].outletCode,
+                                                      style: kBlackSmallText,
+                                                    )),
+                                                Container(
+                                                    width: size.width / 7,
+                                                    child: Text(
+                                                      data[index].outletName,
+                                                      style: kBlackSmallText,
+                                                    )),
+                                                Container(
+                                                    width: size.width / 10,
+                                                    child: Text(
+                                                      displayPrice(data[index]
+                                                          .totalBill),
+                                                      style: kBlackSmallText,
+                                                    )),
+                                                Container(
+                                                    width: size.width / 10,
+                                                    child: Text(
+                                                      data[index].userName,
+                                                      style: kBlackSmallText,
+                                                    )),
+                                                Container(
+                                                    width: size.width / 10,
+                                                    child: Text(
+                                                      data[index].doneAt,
+                                                      style: kBlackSmallText,
+                                                    )),
+                                                Container(
+                                                    width: size.width / 10,
+                                                    child: StatusBill(
+                                                        status: data[index]
+                                                            .status)),
+                                                Container(
+                                                    width: size.width / 25,
+                                                    child: Center(
+                                                      child: HoverButton(
+                                                        onPressed: () {
+                                                          Modular.to.pushNamed(
+                                                              '/bill/${data[index].token}');
+                                                        },
+                                                        icon: Icon(
+                                                          Icons
+                                                              .remove_red_eye_sharp,
+                                                          color: Colors.black54,
+                                                        ),
+                                                        onActive: Icon(
+                                                          Icons
+                                                              .remove_red_eye_sharp,
+                                                          color: kGreenColor,
+                                                        ),
+                                                      ),
+                                                    )),
+                                              ],
+                                            ),
+                                          ),
+                                          itemCount: data.length,
+                                          shrinkWrap: true,
+                                        )
+                                      : Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 30),
+                                          child: Center(
                                               child: Text(
-                                                data[index].id.toString(),
-                                                style: kBlackSmallText,
-                                              )),
-                                          Container(
-                                              width: size.width / 10,
-                                              child: Text(
-                                                data[index].outletCode,
-                                                style: kBlackSmallText,
-                                              )),
-                                          Container(
-                                              width: size.width / 7,
-                                              child: Text(
-                                                data[index].outletName,
-                                                style: kBlackSmallText,
-                                              )),
-                                          Container(
-                                              width: size.width / 10,
-                                              child: Text(
-                                                displayPrice(data[index].totalBill),
-                                                style: kBlackSmallText,
-                                              )),
-                                          Container(
-                                              width: size.width / 10,
-                                              child: Text(
-                                                data[index].userName,
-                                                style: kBlackSmallText,
-                                              )),
-                                          Container(
-                                              width: size.width / 10,
-                                              child: Text(
-                                                data[index].doneAt,
-                                                style: kBlackSmallText,
-                                              )),
-                                          Container(
-                                              width: size.width / 10,
-                                              child: StatusBill(
-                                                  status: data[index].status)),
-                                          Container(
-                                              width: size.width / 25,
-                                              child: Center(
-                                                child: HoverButton(
-                                                  onPressed: () {
-                                                    Modular.to.pushNamed(
-                                                        '/bill/${data[index].token}');
-                                                  },
-                                                  icon: Icon(Icons.remove_red_eye_sharp, color: Colors.black54,),
-                                                  onActive: Icon(Icons.remove_red_eye_sharp, color: kGreenColor,),
-                                                ),
-                                              )),
-                                        ],
-                                      ),
-                                    ),
-                                    itemCount: data.length,
-                                    shrinkWrap: true,
-                                  ): Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 30),
-                                    child: Center(child: Text('Danh sách trống', style: kGreySmallText,)),
-                                  ),
+                                            'Danh sách trống',
+                                            style: kGreySmallText,
+                                          )),
+                                        ),
                                 ),
-                                Pagination(current: state.response.currentPage == 0 ? 1 : state.response.currentPage, total: state.response.totalPage, callback: (index) {
-                                  billCubit.fetchIndexPage(page: index);
-                                  // setState(() {
-                                  //   currentIndex = index;
-                                  //   _scrollController.animateTo(
-                                  //     _scrollController.position.minScrollExtent,
-                                  //     curve: Curves.easeOut,
-                                  //     duration: const Duration(milliseconds: 100),
-                                  //   );
-                                  // });
-                                },)
+                                const SizedBox(
+                                  height: 6,
+                                ),
+                                Pagination(
+                                  current: state.response.currentPage == 0
+                                      ? 1
+                                      : state.response.currentPage,
+                                  total: state.response.totalPage,
+                                  callback: (index) {
+                                    billCubit.fetchIndexPage(page: index);
+                                    // setState(() {
+                                    //   currentIndex = index;
+                                    //   _scrollController.animateTo(
+                                    //     _scrollController.position.minScrollExtent,
+                                    //     curve: Curves.easeOut,
+                                    //     duration: const Duration(milliseconds: 100),
+                                    //   );
+                                    // });
+                                  },
+                                )
                               ],
                             );
                           }
-                          if(state is BillLoadFailure){
+                          if (state is BillLoadFailure) {
                             return JDataTable(
+                                // label: 'Kết quả: ',
+                                // value: 0,
+                                // labelStyle: kRedText,
+                                // valueStyle: kRedText,
+                                maxHeight: size.height * 0.6,
+                                headerData: _header,
+                                body: Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 30),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'Danh sách trống',
+                                        style: kGreySmallText,
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      ElevatedButton(
+                                          onPressed: () {
+                                            billCubit.reloadBill();
+                                          },
+                                          child: Text('tải lại')),
+                                    ],
+                                  ),
+                                ));
+                          }
+                          return JDataTable(
                               // label: 'Kết quả: ',
                               // value: 0,
                               // labelStyle: kRedText,
                               // valueStyle: kRedText,
-                                maxHeight: size.height * 0.6,
-                                headerData: _header,
-                                body: Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 30),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text('Danh sách trống', style: kGreySmallText,),
-                                      const SizedBox(height: 10,),
-                                      ElevatedButton(onPressed: (){
-                                        billCubit.reloadBill();
-                                      }, child: Text('tải lại')),
-                                    ],
-                                  ),
-                                )
-                            );
-                          }
-                          return JDataTable(
-                            // label: 'Kết quả: ',
-                            // value: 0,
-                            // labelStyle: kRedText,
-                            // valueStyle: kRedText,
                               maxHeight: size.height * 0.6,
                               headerData: _header,
-                              body: Center(child: Container(height: 60, width: 60, child: CircularProgressIndicator(),),)
-                          );
+                              body: Center(
+                                child: Container(
+                                  height: 60,
+                                  width: 60,
+                                  child: CircularProgressIndicator(),
+                                ),
+                              ));
                         },
                       )
                     ],

@@ -94,10 +94,6 @@ class StatisticRemoteDataSourceImpl implements StatisticRemoteDataSource{
     final List<Map<String, dynamic>> data = [];
 
     await Future.forEach(allPath, (url) async {
-      // Response _resp = await cDio.getResponse(
-      //     path: url
-      //         .split('api/')
-      //         .last);
       Response _resp = await getReport(url);
       data.addAll(
           (await compute(parseData, _resp.data as List<dynamic>)));
@@ -129,6 +125,6 @@ List<Map<String, dynamic>> parseData(List<dynamic> json) {
     'total_money': moneyTransform(e['total_money'] ?? 0),
     'note': e['note'],
     'created_by': e['created_by'],
-    'created_at': (e['created_at'] as String).split(' ').last.split('/').sublist(0,2).map((e) => int.parse(e)).toList().join('/')
+    'created_at': e['created_at'], //(e['created_at'] as String).split(' ').last.split('/').sublist(0,2).map((e) => int.parse(e)).toList().join('/')
   }).toList();
 }
