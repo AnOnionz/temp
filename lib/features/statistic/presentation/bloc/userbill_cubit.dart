@@ -12,7 +12,11 @@ class UserBillCubit extends Cubit<UserBillState> {
   UserBillCubit({@required this.fetchAllUserBill}) : super(UserBillInitial());
 
   void fetchUserBill({int begin,int end, int userId}) async {
-    final userBills = await fetchAllUserBill(UserBillParam(begin: begin, end: end, userId: userId));
+    final nBegin = begin != null ? begin + DateTime.now().hour*3600 + DateTime.now().minute*60 : null;
+    final nEnd = end !=null ? end +  DateTime.now().hour*3600 + DateTime.now().minute*60 : null;
+    final userBills = await fetchAllUserBill(UserBillParam(begin: nBegin, end: nEnd, userId: userId));
+    print(nBegin);
+    print(nEnd);
     filter = UserBillParam(begin: begin, end: end, userId: userId);
     emit(userBills.fold((l) {
       displayError(l);

@@ -16,8 +16,8 @@ class BillCubit extends Cubit<BillState> {
   BillCubit({@required this.fetchAllBill}) : super(BillInitial());
 
   void fetchBill({int begin, int end, int status, int billId, String outletCode, int userId}) async {
-    final nBegin = begin != null ? begin + DateTime.now().hour*3600 : null;
-    final nEnd = end !=null ? end +  DateTime.now().minute*60 : null;
+    final nBegin = begin != null ? begin + DateTime.now().hour*3600 + DateTime.now().minute*60 : null;
+    final nEnd = end !=null ? end +  DateTime.now().hour*3600 + DateTime.now().minute*60 : null;
     filter = BillParams(userId: userId, begin: nBegin, end: nEnd, outletCode: outletCode, billId: billId, status: status);
     final bills = await fetchAllBill(filter);
     emit(bills.fold((l) {

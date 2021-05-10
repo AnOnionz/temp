@@ -216,10 +216,11 @@ class _UsersState extends State<Users> {
                               labelStyle: kBlackBigText,
                               valueStyle: kRedBigText,
                               maxHeight: size.height - 415, headerData: _header, body:
-                            ListView.separated(
-                              separatorBuilder: (context, index) => Divider(color: kGreyColor,),
+                              ListView.separated(
+                              physics: BouncingScrollPhysics(),
+                              separatorBuilder: (context, index) => Divider(color: kGreyColor),
                               itemBuilder:(context, index) => Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 7.0),
+                                padding: const EdgeInsets.symmetric(vertical: 5.0),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
@@ -284,8 +285,8 @@ class _UsersState extends State<Users> {
                             maxHeight: size.height - 415, headerData: _header, body:
                               Center(
                                 child: Container(
-                                    width: 60,
-                                    height: 60,
+                                    width: 40,
+                                    height: 40,
                                     child: CircularProgressIndicator()),
                               )
                           );

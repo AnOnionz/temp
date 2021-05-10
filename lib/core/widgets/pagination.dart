@@ -34,7 +34,7 @@ class _PaginationState extends State<Pagination> {
             });
             widget.callback(currentIndex);
           },
-              child: Container(child: Icon(Icons.arrow_back_ios_outlined),))
+              child: Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10), child: Icon(Icons.arrow_back_ios_outlined, size: 12,),))
         ], ...List.generate(3, (index) {
           return PaginationItem(index: index + currentIndex, currentIndex: currentIndex, onPressed: () {
             setState(() {
@@ -54,7 +54,7 @@ class _PaginationState extends State<Pagination> {
                   currentIndex = 1;
                 });
                 widget.callback(currentIndex);
-              }, child: Container(padding: const EdgeInsets.symmetric(horizontal: 5), child: Icon(Icons.arrow_back_ios_outlined),))
+              }, child: Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10), child: Icon(Icons.arrow_back_ios_outlined, size: 12,),))
         ],...List.generate(3, (index) {
           return PaginationItem(index: index + widget.total - 5, currentIndex: currentIndex, onPressed: () {
             setState(() {
@@ -75,7 +75,7 @@ class _PaginationState extends State<Pagination> {
                     currentIndex = 1;
                   });
                   widget.callback(currentIndex);
-                }, child: Container(padding: const EdgeInsets.symmetric(horizontal: 5), child: Icon(Icons.arrow_back_ios_outlined),))
+                }, child: Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10), child: Icon(Icons.arrow_back_ios_outlined, size: 12,),))
           ] : [],...List.generate(widget.total, (index) {
             return PaginationItem(index: index + 1, currentIndex: currentIndex, onPressed: () {
               setState(() {
@@ -109,10 +109,12 @@ class PaginationItem extends StatelessWidget{
       child: InkWell(
         onTap: onPressed,
         child: Container(
-          height: 33,
-          width: 33,
+          constraints: BoxConstraints(
+            minWidth: 26,
+            minHeight: 26
+          ),
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(4.0),
+              borderRadius: BorderRadius.circular(2.0),
               color: currentIndex == index ? kGreenColor : kPaginationFill,
               border: Border.all(
                   color: currentIndex == index ? Colors.transparent : kPaginationBorder

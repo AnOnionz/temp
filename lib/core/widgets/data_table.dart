@@ -28,7 +28,7 @@ class JDataTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: MainAxisSize.max,
       children: [
         label != null ? Align(
             alignment: Alignment.topLeft,

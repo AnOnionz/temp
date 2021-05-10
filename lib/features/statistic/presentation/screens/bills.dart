@@ -298,6 +298,7 @@ class _BillsState extends State<Bills> {
                             print(state.response.currentPage);
                             data = state.response.bills;
                             return Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 JDataTable(
                                   // label: 'Kết quả: ',
@@ -316,7 +317,7 @@ class _BillsState extends State<Bills> {
                                           itemBuilder: (context, index) =>
                                               Padding(
                                             padding: const EdgeInsets.symmetric(
-                                                vertical: 7.0),
+                                                vertical: 5.0),
                                             child: Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment
@@ -404,9 +405,7 @@ class _BillsState extends State<Bills> {
                                           )),
                                         ),
                                 ),
-                                const SizedBox(
-                                  height: 6,
-                                ),
+                                const SizedBox(height: 10,),
                                 Pagination(
                                   current: state.response.currentPage == 0
                                       ? 1
@@ -466,8 +465,8 @@ class _BillsState extends State<Bills> {
                               headerData: _header,
                               body: Center(
                                 child: Container(
-                                  height: 60,
-                                  width: 60,
+                                  height: 40,
+                                  width: 40,
                                   child: CircularProgressIndicator(),
                                 ),
                               ));
